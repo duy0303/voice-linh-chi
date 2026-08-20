@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Speech CSKH theo Tình Huống</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 20px; background: #f0f2f5; }
+        .box { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
+        button { background: #007bff; color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-size: 16px; margin-bottom: 15px; }
+        button.active { background: #dc3545; }
+        #result { margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 10px; min-height: 60px; text-align: left; background: #fafafa; }
+        #reply { margin-top: 15px; padding: 15px; border: 1px solid #b8daff; border-radius: 10px; text-align: left; background: #e8f4f8; color: #004085; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Trợ Lý Voice CSKH</h2>
+    <button id="record-btn">🎤 Bắt đầu nói</button>
+    
+    <div><strong>Khách hỏi:</strong></div>
+    <div id="result">Đang chờ bạn nói...</div>
+
+    <div style="margin-top: 15px;"><strong>AI Trả lời:</strong></div>
+    <div id="reply">Chưa có phản hồi...</div>
+</div>
+
+<script>
+    const btn = document.getElementById('record-btn');
+    const resultBox = document.getElementById('result');
+    const replyBox = document.getElementById('reply');
+
+    // 1. Khai báo danh sách file âm thanh theo tình huống (Từ khóa -> File audio)
+    const voiceResponses = [
+        {
+            keywords: ['chào', 'hello', 'hi'],
+            text: "Xin chào quý khách! Tôi có thể hỗ trợ gì cho bạn?",
+            audio: 'audio/xin_chao.mp3'
+        },
+        {
+            keywords: ['bảo hành', 'sửa chữa', 'đổi trả'],
+            text: "Sản phẩm bên em được bảo hành 12 tháng tận nhà ạ.",
+            audio: 'audio/bao_hanh.mp3'
+        }
+    ];
+
+    // File âm thanh mặc định khi không khớp từ khóa nào
+    const defaultResponse = {
+        text: "Cảm ơn bạn, thông tin này em đã ghi nhận lại.",
+        audio: 'audio/mac_dinh.mp3'
+    };
+
+    // 2. Khởi tạo SpeechRecognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'vi-VN';
+
+    btn.addEventListener('click', () => {
+        recognition.start();
+    });
+
+    recognition.onstart = () => {
+        btn.textContent = "Đang lắng nghe...";
+        btn.classList.add('active');
+    };
+
+    recognition.onresult = (event) => {
+        const userText = event.results[0][0].transcript.toLowerCase();
+        resultBox.textContent = userText;
+
+        // Xử lý tìm tình huống phù hợp
+      handleSituation(userText);
+    };
+
+    recognition.onend = () => {
+        btn.textContent = "🎤 Bắt đầu nói";
+        btn.classList.remove('active');
+    };
+
+    // 3. Hàm phát file âm thanh tương ứng
+    function handleSituation(inputText) {
+        let matched = voiceResponses.find(item => 
+            item.keywords.some(kw => inputText.includes(kw))
+        );
+
+        let target = matched ? matched : defaultResponse;
+
+        // Cập nhật giao diện
+        replyBox.textContent = target.text;
+
+        // Phát file âm thanh (.mp3)
+        const audioPlayer = new Audio(target.audio);
+        audioPlayer.play().catch(error => {
+            console.log("Không thể phát file âm thanh: ", error);
+        });
+    }
+</script>
+
+</body>
+</html>
