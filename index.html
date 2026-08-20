@@ -1,102 +1,143 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Voice CSKH</title>
-    <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; padding: 20px; background: #f0f2f5; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 480px; text-align: center; }
-        button { background: #007bff; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-size: 16px; margin-bottom: 15px; }
-        button.active { background: #dc3545; }
-        .box { margin-top: 10px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; text-align: left; background: #fafafa; min-height: 40px; }
-        .ai-reply { background: #e7f3ff; border-color: #b6d4fe; color: #084298; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-<div class="card">
-    <h2>Trợ Lý Voice CSKH</h2>
-    <button id="btn-record">🎤 Nhấn để nói</button>
-
-    <div><strong>Khách hỏi:</strong></div>
-    <div id="user-text" class="box">Đang chờ bạn nói...</div>
-
-    <div style="margin-top: 15px;"><strong>AI Trả lời:</strong></div>
-    <div id="ai-text" class="box ai-reply">Chưa có phản hồi...</div>
+<input type="text" id="userInput" class="input-text" placeholder="Nhập hoặc nói câu hỏi..." onkeypress="if(event.key==='Enter') sendMessage()">
+        <button class="btn-send" onclick="sendMessage()">Gửi</button>
+    </div>
 </div>
 
 <script>
-    const btnRecord = document.getElementById('btn-record');
-    const userTextBox = document.getElementById('user-text');
-    const aiTextBox = document.getElementById('ai-text');
-
-    // 1. KHAI BÁO KỊCH BẢN: Danh sách Từ Khóa - File Âm Thanh - Văn Bản Hiển Thị
-    const scenarios = [
+    // Cơ sở dữ liệu câu hỏi và file audio trả lời
+    const KNOWLEDGE_BASE = [
         {
-            keywords: ['cách sử dụng', 'uống thế nào', 'dùng ra sao', 'cần cắt lát không'],
-            audioFile: 'audio.cach_su-dung.wav',
-            displayText:'Hiện tại, nấm Linh Chi đóng hộp của chúng tôi có thể dùng theo cách cắt lát pha trà. Mỗi lần dùng có thể cắt 2 đến 3 lát mỏng dài khoảng hai đốt ngón tay và pha với một lượng nước sôi vừa phải. Mỗi ngày dùng một cốc sẽ giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.'
+            keywords: ["dùng", "sử dụng", "pha", "cắt", "lát", "chế biến", "cách dùng", "uống", "như thế nào"],
+            reply: "Hiện tại, nấm Linh Chi đóng hộp có thể dùng theo cách cắt lát pha trà. Mỗi lần dùng cắt 2 đến 3 lát mỏng dài khoảng 2 đốt ngón tay và pha với nước sôi vừa phải. Mỗi ngày dùng một cốc giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.",
+            audio: "audio.cach_su-dung.wav"
+        },
+        {
+            keywords: ["công dụng", "tác dụng", "lợi ích", "ngủ", "tim", "sức khỏe", "tốt cho"],
+            reply: "Mỗi ngày dùng một cốc trà nấm Linh Chi sẽ giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.",
+            audio: "audio.cach_su-dung.wav"
+        },
+        {
+            keywords: ["bao nhiêu", "mấy lát", "liều lượng", "mấy cốc", "đốt ngón tay"],
+            reply: "Mỗi lần dùng cắt 2 đến 3 lát mỏng dài khoảng 2 đốt ngón tay, pha nước sôi và uống 1 cốc mỗi ngày.",
+            audio: "audio.cach_su-dung.wav"
         }
-    
-    // 2. KHỞI TẠO CÔNG CỤ NHẬN DẠNG GIỌNG NÓI (STT)
+    ];
+
+    const DEFAULT_REPLY = {
+        reply: "Sản phẩm nấm Linh Chi đóng hộp dùng bằng cách cắt 2-3 lát mỏng pha nước sôi. Uống 1 cốc mỗi ngày giúp cải thiện giấc ngủ và điều hòa tim mạch.",
+        audio: "audio.cach_su-dung.wav"
+    };
+
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const micBtn = document.getElementById('micBtn');
+
+    let currentAudio = null;
+
+    // Tích hợp Web Speech API (Chuyển giọng nói thành văn bản - STT)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isRecording = false;
 
-    if (!SpeechRecognition) {
-        alert("Trình duyệt không hỗ trợ! Vui lòng dùng Chrome hoặc Edge.");
-    } else {'
-    let currentAudio = null; // Quản lý file âm thanh đang phát
-const recognition = new SpeechRecognition();
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
         recognition.lang = 'vi-VN';
-
-        btnRecord.addEventListener('click', () => {
-            // Ngừng phát âm thanh cũ nếu đang chạy
-            if (currentAudio) { currentAudio.pause(); }
-            recognition.start();
-        });
+        recognition.continuous = false;
+        recognition.interimResults = false;
 
         recognition.onstart = () => {
-            btnRecord.textContent = "Đang lắng nghe...";
-            btnRecord.classList.add('active');
-        };
-
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript.toLowerCase();
-            userTextBox.textContent = transcript;
-
-            // Xử lý tìm câu trả lời chính xác
-            matchAndPlayAudio(transcript);
+            isRecording = true;
+            micBtn.classList.add('recording');
         };
 
         recognition.onend = () => {
-            btnRecord.textContent = "🎤 Nhấn để nói";
-            btnRecord.classList.remove('active');
+            isRecording = false;
+            micBtn.classList.remove('recording');
         };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            userInput.value = transcript;
+            sendMessage();
+        };
+        recognition.onerror = () => {
+            isRecording = false;
+            micBtn.classList.remove('recording');
+        };
+    } else {
+        micBtn.style.display = 'none';
+        console.warn('Trình duyệt không hỗ trợ Web Speech API.');
     }
 
-    // 3. HÀM XỬ LÝ KHỚP CÂU HỎI VÀ PHÁT FILE GHI ÂM
-    function matchAndPlayAudio(inputText) {
-        // Các từ khóa khách hàng có thể hỏi
-            keywords: ['cách dùng', 'sử dụng', 'pha trà', 'dùng thế nào', 'uống thế nào', 'linh chi', 'nấm linh chi', 'tác dụng'],
-            
-            // Đường dẫn đến file ghi âm bạn đã tải lên GitHub
-            audioFile: 'audio.cach_su-dung.wav',
-            
-            // Văn bản hiển thị tương ứng với file âm thanh
-            displayText: 'Hiện tại, nấm Linh Chi đóng hộp của chúng tôi có thể dùng theo cách cắt lát pha trà. Mỗi lần dùng có thể cắt 2 đến 3 lát mỏng dài khoảng hai đốt ngón tay và pha với một lượng nước sôi vừa phải. Mỗi ngày dùng một cốc sẽ giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.'
+    micBtn.addEventListener('click', () => {
+        if (!recognition) return;
+        if (isRecording) {
+            recognition.stop();
+        } else {
+            recognition.start();
         }
-    ];
-        // Cập nhật văn bản hiển thị lên giao diện
-        aiTextBox.textContent = target.displayText;
+    });
 
-        // Tiến hành phát file ghi âm
-        currentAudio = new Audio(target.audioFile);
-        currentAudio.play().catch(error => {
-            console.error("Lỗi không thể phát file âm thanh:", error);
-            alert("Không tìm thấy file audio hoặc đường dẫn bị sai!");
-        });
+    function addMessage(text, sender) {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', sender);
+        msgDiv.textContent = text;
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function getBotData(text) {
+        const lowerText = text.toLowerCase();
+        for (const item of KNOWLEDGE_BASE) {
+            if (item.keywords.some(kw => lowerText.includes(kw))) {
+                return item;
+            }
+        }
+        return DEFAULT_REPLY;
+    }
+
+    // Hàm phát file âm thanh audio.cach_su-dung.wav
+    function playAudioFile(audioSrc, fallbackText) {
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+        }
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+
+        if (audioSrc) {
+            currentAudio = new Audio(audioSrc);
+            currentAudio.play().catch(error => {
+                console.warn("Không thể phát file âm thanh tự động, dùng giọng đọc trình duyệt:", error);
+                speakFallbackText(fallbackText);
+            });
+        } else {
+            speakFallbackText(fallbackText);
+        }
+    }
+
+    function speakFallbackText(text) {
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'vi-VN';
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        addMessage(text, 'user');
+        userInput.value = '';
+
+        setTimeout(() => {
+            const botData = getBotData(text);
+            addMessage(botData.reply, 'bot');
+            playAudioFile(botData.audio, botData.reply);
+        }, 300);
     }
 </script>
-
 </body>
 </html>
