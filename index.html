@@ -1,3 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tư Vấn Nấm Linh Chi AI</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .chat-card { background: #fff; width: 100%; max-width: 450px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; height: 80vh; }
+        .chat-header { background: #8b1e0f; color: #fff; padding: 16px; text-align: center; }
+        .chat-header h2 { font-size: 1.2rem; margin-bottom: 4px; }
+        .chat-header p { font-size: 0.8rem; opacity: 0.8; }
+        .chat-box { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .message { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.4; }
+        .bot { background: #f0f0f0; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .user { background: #8b1e0f; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .controls { padding: 16px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: center; }
+        .btn-mic { background: #8b1e0f; border: none; color: white; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
+        .btn-mic.recording { background: #dc3545; animation: pulse 1.2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        .input-text { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 24px; outline: none; }
+        .btn-send { background: #333; border: none; color: white; padding: 10px 16px; border-radius: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="chat-card">
+    <div class="chat-header">
+        <h2>Trợ Lý Nấm Linh Chi</h2>
+        <p>Hỏi đáp bằng giọng nói hoặc gõ phím</p>
+    </div>
+    <div class="chat-box" id="chatBox">
+        <div class="message bot">Xin chào! Tôi có thể giúp gì cho bạn về sản phẩm Nấm Linh Chi đóng hộp?</div>
+    </div>
+    <div class="controls">
+        <button class="btn-mic" id="micBtn" title="Nhấn để nói">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
 <input type="text" id="userInput" class="input-text" placeholder="Nhập hoặc nói câu hỏi..." onkeypress="if(event.key==='Enter') sendMessage()">
         <button class="btn-send" onclick="sendMessage()">Gửi</button>
     </div>
