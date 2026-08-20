@@ -80,40 +80,30 @@
     const userTextBox = document.getElementById('user-text');
     const aiTextBox = document.getElementById('ai-text');
 
-    // TẢI TRỰC TIẾP FILE ÂM THANH BẠN CUNG CẤP (DẠNG BASE64)
-    const AUDIO_NAM_LINH_CHI = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA="; 
-
-    // 1. KỊCH BẢN TƯ VẤN NẤM LINH CHI
-    console.error("Lỗi phát âm thanh:", error);
-        });
-    }
-</script>
-
-</body>
-</html>
-const scenarios = [
+    // 1. KỊCH BẢN TƯ VẤN NẤM LINH CHI (ĐÃ CẬP NHẬT FILE .MP3)
+    const scenarios = [
         {
             keywords: [
-                'cách dùng', 'sử dụng', 'pha trà', 'dùng thế nào', 'uống thế nào', 
-                'chế biến', 'linh chi', 'nấm linh chi', 'tác dụng', 'giấc ngủ', 'tim mạch'
+                'cách dùng', 'sử dụng', 'pha trà', 'dùng thế nào', 'uống thế nào','chế biến', 'linh chi', 'nấm linh chi', 'tác dụng', 'giấc ngủ', 'tim mạch'
             ],
-            audioData: AUDIO_NAM_LINH_CHI,
+            // Đường dẫn file MP3 nằm trực tiếp ở nhánh main / thư mục gốc
+            audioFile: 'cach_su-dung.mp3',
             displayText: 'Hiện tại, nấm Linh Chi đóng hộp của chúng tôi có thể dùng theo cách cắt lát pha trà. Mỗi lần dùng có thể cắt 2 đến 3 lát mỏng dài khoảng hai đốt ngón tay và pha với một lượng nước sôi vừa phải. Mỗi ngày dùng một cốc sẽ giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.'
         }
     ];
 
     const defaultScenario = {
-        audioData: AUDIO_NAM_LINH_CHI,
+        audioFile: 'cach_su-dung.mp3',
         displayText: 'Dạ em chưa nghe rõ. Anh/chị có thể hỏi lại về cách sử dụng hoặc tác dụng của Nấm Linh Chi đóng hộp được không ạ?'
     };
 
     let currentAudio = null;
 
-    // 2. KHỞI TẠO CÔNG CỤ NHẬN DẠNG GIỌNG NÓI
+    // 2. KHỞI TẠO CÔNG CỤ NHẬN DẠNG GIỌNG NÓI (WEB SPEECH API)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-        alert("Trình duyệt không hỗ trợ Web Speech API! Vui lòng dùng Google Chrome hoặc Microsoft Edge.");
+        alert("Trình duyệt không hỗ trợ Web Speech API! Vui lòng truy cập bằng Google Chrome hoặc Microsoft Edge.");
     } else {
         const recognition = new SpeechRecognition();
         recognition.lang = 'vi-VN';
@@ -150,7 +140,7 @@ const scenarios = [
         };
     }
 
-    // 3. XỬ LÝ PHÁT ÂM THANH
+    // 3. HÀM XỬ LÝ KHỚP CÂU HỎI VÀ PHÁT AUDIO (.MP3)
     function matchAndPlayAudio(inputText) {
         const matched = scenarios.find(item => 
             item.keywords.some(kw => inputText.includes(kw))
@@ -160,6 +150,13 @@ const scenarios = [
 
         aiTextBox.textContent = target.displayText;
 
-        // Phát trực tiếp từ dữ liệu âm thanh nhúng sẵn
-        currentAudio = new Audio(target.audioData);
-        currentAudio.play().catch(error => {
+        // Tải và phát file MP3
+        currentAudio = new Audio(target.audioFile);
+        currentAudio.play().catch(error => {console.error("Không thể phát file âm thanh:", error);
+            alert("Lỗi: Hãy chắc chắn bạn đã tải file '" + target.audioFile + "' lên thư mục chính (main) của GitHub!");
+        });
+    }
+</script>
+
+</body>
+</html>
