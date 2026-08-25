@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tư Vấn Nấm Linh Chi AI</title>
+    <title>Trợ lí linh chi AI</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
@@ -51,18 +51,18 @@
         <div class="cert-card">
             <div class="cert-title">📜 Minh Chứng Nguồn Gốc Sản Phẩm</div>
             <div class="cert-body">
-                <!-- Thay link anh_nam_linh_chi.jpg bằng đường dẫn ảnh thực tế của bạn -->
-                <img class="cert-img" src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=200&q=80" alt="Nấm Linh Chi LC3">
+
+                <img class="cert-img" src="mihchug1.jpg" alt="Nấm Linh Chi LC3">
                 <div class="cert-info">
                     <div class="cert-item"><span class="cert-label">Giống nấm:</span> Linh Chi LC3</div>
                     <div class="cert-item"><span class="cert-label">Đơn vị nhân giống & nuôi trồng:</span> Đội Trái Tim Xanh</div>
                     <div class="cert-item"><span class="cert-label">Kiểm tra trình tự gene:</span> Ngân hàng gene NCBI</div>
-                    <div class="cert-item"><span class="cert-label">Kết quả:</span> <span class="highlight">Trùng khớp với Ganoderma Lucidum</span></div>
+                    <div class="cert-item"><span class="cert-label">Kết quả:</span> <span class="highlight">Trùng khớp với Ganoderma Multipileum</span></div>
                 </div>
             </div>
         </div>
 
-        <div class="message bot">Xin chào! Tôi có thể giúp gì cho bạn về sản phẩm Nấm Linh Chi đóng hộp?</div>
+        <div class="message bot">Xin chào! Tôi có thể giúp gì cho bạn về sản phẩm Nấm Linh Chi?</div>
     </div>
 
     <div class="controls">
@@ -80,26 +80,26 @@
         {
             keywords: ["dùng", "sử dụng", "pha", "cắt", "lát", "chế biến", "cách dùng", "uống", "như thế nào"],
             reply: "Hiện tại, nấm Linh Chi đóng hộp của chúng tôi có thể dùng theo cách cắt lát pha trà. Mỗi lần dùng có thể cắt 2 đến 3 lát mỏng dài khoảng 2 đốt ngón tay và pha với một lượng nước sôi vừa phải. Mỗi ngày dùng một cốc sẽ giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.",
-            audio: "audio.cach_su-dung.wav",
-            image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&q=80"
+            audio: "audio.cach_su-dung.mp3",
+            image: "tralihchi.jpg"
         },
         {
             keywords: ["công dụng", "tác dụng", "lợi ích", "ngủ", "tim", "sức khỏe", "tốt cho"],
             reply: "Mỗi ngày dùng một cốc trà nấm Linh Chi giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.",
-            audio: "audio.cach_su-dung.wav",
-            image: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=400&q=80"
+            audio: "audio.cach_su-dung.mp3",
+            image: "tralihchi.jpg"
         },
         {
             keywords: ["nguồn gốc", "xuất xứ", "ncbi", "lc3", "trái tim xanh", "gene", "loại nấm", "giống"],
-            reply: "Nấm Linh Chi của chúng tôi thuộc giống LC3, được đội Trái Tim Xanh nhân giống và nuôi trồng. Sản phẩm đã qua kiểm tra trình tự gene trên ngân hàng gene NCBI cho kết quả trùng khớp với Ganoderma Lucidum.",
-            audio: "audio.cach_su-dung.wav"
+            reply: "Nấm Linh Chi của chúng tôi thuộc giống LC3, được đội Trái Tim Xanh nhân giống và nuôi trồng. Sản phẩm đã qua kiểm tra trình tự gene trên ngân hàng gene NCBI cho kết quả trùng khớp với Ganoderma Multipelium.",
+            audio: ""
         }
     ];
 
     const DEFAULT_REPLY = {
         reply: "Sản phẩm nấm Linh Chi đóng hộp giống LC3 (Ganoderma Lucidum) dùng bằng cách cắt 2-3 lát mỏng pha nước sôi. Uống 1 cốc mỗi ngày giúp cải thiện giấc ngủ và điều hòa tim mạch.",
-        audio: "audio.cach_su-dung.wav",
-        image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&q=80"
+        audio: "audio.cach_su-dung.mp3",
+        image: "tralihchi.jpg"
     };
 
     const chatBox = document.getElementById('chatBox');
