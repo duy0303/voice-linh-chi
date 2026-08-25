@@ -6,49 +6,72 @@
     <title>Trợ Lý AI Nấm Linh Chi</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background-color: #f4f6f9; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; gap: 16px; }
+        body { background-color: #f4f6f9; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; gap: 20px; }
         
-        /* 1. BẢNG MINH CHỨNG NGUỒN GỐC (BÊN NGOÀI KHUNG CHAT) */
-        .cert-card { background: #fff; border: 1px solid #e2d2b6; border-radius: 16px; padding: 16px; width: 100%; max-width: 480px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-size: 0.85rem; color: #333; }
-        .cert-title { font-weight: bold; color: #8b1e0f; font-size: 0.95rem; margin-bottom: 10px; text-align: center; text-transform: uppercase; border-bottom: 1px dashed #e2d2b6; padding-bottom: 6px; }
-        .cert-body { display: flex; gap: 12px; align-items: center; }
-        .cert-img { width: 95px; height: 95px; border-radius: 8px; object-fit: cover; border: 1px solid #ccc; flex-shrink: 0; }
-        .cert-info { display: flex; flex-direction: column; gap: 4px; }
-        .cert-item { line-height: 1.35; }
-        .cert-label { font-weight: bold; color: #555; }
+        /* BẢNG MINH CHỨNG NGUỒN GỐC TO RÕ */
+        .cert-card { 
+            background: #fff; 
+            border: 2px solid #e2d2b6; 
+            border-radius: 18px; 
+            padding: 24px; 
+            width: 100%; 
+            max-width: 650px; 
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08); 
+            font-size: 1rem; 
+            color: #333; 
+        }
+        .cert-title { 
+            font-weight: bold; 
+            color: #8b1e0f; 
+            font-size: 1.2rem; 
+            margin-bottom: 16px; 
+            text-align: center; 
+            text-transform: uppercase; 
+            border-bottom: 2px dashed #e2d2b6; 
+            padding-bottom: 10px; 
+        }
+        .cert-body { display: flex; gap: 20px; align-items: center; }
+        .cert-img { 
+            width: 140px; 
+            height: 140px; 
+            border-radius: 12px; 
+            object-fit: cover; 
+            border: 2px solid #ddd; 
+            flex-shrink: 0; 
+        }
+        .cert-info { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .cert-item { line-height: 1.5; font-size: 1.05rem; }
+        .cert-label { font-weight: bold; color: #444; }
         .highlight { color: #2e7d32; font-weight: bold; }
 
-        /* 2. KHUNG CHAT AI */
-        .chat-card { background: #fff; width: 100%; max-width: 480px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; height: 68vh; }
+        /* KHUNG CHAT AI */
+        .chat-card { background: #fff; width: 100%; max-width: 650px; border-radius: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; height: 65vh; }
         .chat-header { background: #8b1e0f; color: #fff; padding: 16px; text-align: center; }
-        .chat-header h2 { font-size: 1.2rem; margin-bottom: 4px; }
-        .chat-header p { font-size: 0.8rem; opacity: 0.8; }
-        .chat-box { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .chat-header h2 { font-size: 1.25rem; margin-bottom: 4px; }
+        .chat-header p { font-size: 0.85rem; opacity: 0.85; }
+        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
 
         /* BONG BÓNG TIN NHẮN */
-        .message { max-width: 82%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.4; word-break: break-word; }
+        .message { max-width: 80%; padding: 12px 16px; border-radius: 14px; font-size: 1rem; line-height: 1.45; word-break: break-word; }
         .bot { background: #f0f0f0; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
         .user { background: #8b1e0f; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
         
-        /* ẢNH TRONG CHAT */
-        .msg-image { width: 100%; max-width: 230px; border-radius: 8px; margin-top: 8px; display: block; border: 1px solid #ddd; }
-        
-        /* THANH ĐIỀU KHIỂN NỔI */
-        .controls { padding: 16px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: center; }
-        .btn-mic { background: #8b1e0f; border: none; color: white; width: 46px; height: 46px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
+        /* ĐIỀU KHIỂN & MICRO */
+        .controls { padding: 16px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center; }
+        .btn-mic { background: #8b1e0f; border: none; color: white; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
         .btn-mic.recording { background: #dc3545; animation: pulse 1.2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
-        .input-text { flex: 1; padding: 12px 16px; border: 1px solid #ddd; border-radius: 24px; outline: none; font-size: 0.95rem; }
-        .btn-send { background: #333; border: none; color: white; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        .input-text { flex: 1; padding: 12px 18px; border: 1px solid #ddd; border-radius: 24px; outline: none; font-size: 1rem; }
+        .btn-send { background: #333; border: none; color: white; padding: 12px 20px; border-radius: 22px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
     </style>
 </head>
 <body>
 
-<!-- BẢNG MINH CHỨNG NGUỒN GỐC SỬ DỤNG mihchug1.jpg -->
+<!-- BẢNG MINH CHỨNG NGUỒN GỐC -->
 <div class="cert-card">
     <div class="cert-title">📜 MINH CHỨNG NGUỒN GỐC SẢN PHẨM</div>
     <div class="cert-body">
-        <img class="cert-img" src="mihchug1.jpg" alt="Minh chứng 1" onerror="this.src='https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=200&q=80'">
+        <img class="cert-img" src="mihchug1.jpg" alt="Minh chứng 1" onerror="this.src='https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300&q=80'">
         <div class="cert-info">
             <div class="cert-item"><span class="cert-label">Giống nấm:</span> Linh Chi LC3</div>
             <div class="cert-item"><span class="cert-label">Đơn vị nhân giống & nuôi trồng:</span> Đội Trái Tim Xanh</div>
@@ -62,16 +85,16 @@
 <div class="chat-card">
     <div class="chat-header">
         <h2>Trợ Lý AI Nấm Linh Chi</h2>
-        <p>Hỏi đáp bằng văn bản, giọng nói & hình ảnh</p>
+        <p>Hỏi đáp bằng văn bản & giọng nói</p>
     </div>
     
     <div class="chat-box" id="chatBox">
-        <div class="message bot">Xin chào! Tôi có thể giúp gì cho bạn về sản phẩm Nấm Linh Chi?</div>
+        <div class="message bot">Xin chào! Tôi có thể giúp gì cho anh/chị về kỹ thuật nuôi trồng và sử dụng Nấm Linh Chi?</div>
     </div>
 
     <div class="controls">
         <button class="btn-mic" id="micBtn" title="Nhấn để nói">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
         </button>
         <input type="text" id="userInput" class="input-text" placeholder="Nhập hoặc nói câu hỏi...">
         <button class="btn-send" id="sendBtn">Gửi</button>
@@ -79,69 +102,61 @@
 </div>
 
 <script>
-    // NỘI DUNG PHẢN HỒI VÀ LIÊN KẾT TÀI NGUYÊN FILE AM THANH / HÌNH ẢNH
+    // TOÀN BỘ CƠ SỞ DỮ LIỆU ÂM THANH
     const KNOWLEDGE_BASE = [
         {
-            keywords: ["dùng", "sử dụng", "pha", "cắt", "lát", "chế biến", "cách dùng", "uống", "như thế nào", "tra"],
-            reply: "Hiện tại, nấm Linh Chi đóng hộp của chúng tôi có thể dùng theo cách cắt lát pha trà. Mỗi lần dùng có thể cắt 2 đến 3 lát mỏng dài khoảng 2 đốt ngón tài và pha với một lượng nước sôi vừa phải. Mỗi ngày dùng một cốc sẽ giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.",
-            audio: "audio.cach_su-dung.mp3"
+            keywords: ["thu hoạch", "bao lâu", "mấy ngày", "quả thể", "mấy tháng"],
+            reply: "Trong điều kiện dinh dưỡng đầy đủ và chăm sóc đúng cách thì anh/chị có thể thu hoạch quả thể sau 65 đến 75 ngày kể từ ngày giống bắt đầu chạy tơ.",
+            audio: "audio.thu_hoach.mp3"
         },
         {
-            keywords: ["bao lâu nấm chạy tơ", "thời gian chạy tơ", "tơ nấm", "bắt đầu chạy tơ"],
-            reply: "Thời điểm nấm bắt đầu chạy tơ phụ thuộc vào rất nhiều yếu tố như : nhiệt độ môi trường , dinh dưỡng cơ chất. Nếu anh/chị cấy giống trên nền cơ chất giàu dinh dưỡng, nhiệt độ môi trường phù hợp, phôi được nén chặt thì sau khoảng 7 - 10 ngày giống sẽ bắt đảu chạy tơ.",
-            audio: "audio.thoi_diem_chay_to.mp3"
+            keywords: ["chạy tơ", "bắt đầu", "yếu tố", "mấy ngày chạy tơ", "thời điểm"],
+            reply: "Thời điểm để giống bắt đầu chạy tơ phụ thuộc vào rất nhiều yếu tố như nhiệt độ môi trường, dinh dưỡng của cơ chất, độ nén chặt của phôi. Nếu anh/chị cấy giống vào phôi có cơ chất giàu dinh dưỡng được nén chặt thì sau khoảng 7 đến 10 ngày, khi giống đã thích ứng với môi trường sẽ bắt đầu chạy tơ.",
+            audio: "audio.chay_to.mp3"
         },
         {
-            keywords: ["bao lâu thì thu hoạch", "thời gian thu hoạch", "thu hoạch","thu hoạch quả thể"],
-            reply: "Trong điều kiện dinh dưỡng đầy đủ và chăm sóc đúng cách thì anh/chị có thể thu hoạch quả thể sau 65-75 ngày kể từ ngày giống bắt đầu chạy tơ.",
-            audio: "audio.thoi_gian_thu_hoach.mp3"
+            keywords: ["túi phôi", "bịch meo", "cấy", "bao nhiêu phôi", "số lượng"],
+            reply: "Một bịch meo giống nhóm cung cấp, anh/chị có thể cấy tối thiểu khoảng 40 túi phôi.",
+            audio: "audio.so_luong_phoi.mp3"
         },
         {
-            keywords: ["được bao nhiêu phôi", "cho ra bao nhiêu phôi", "số lượng phôi"],
-            reply: "Một bịch meo giống nhóm cung cấp , anh/chị có thể cấy tối thiểu khoảng 40 túi phôi.",
-            audio: "audio.san_luong_phoi.mp3"
+            keywords: ["lc3", "nguồn gốc", "ncbi", "trái tim xanh", "pcr", "trung bày", "chứng nhận"],
+            reply: "Meo giống hiện tại đội đang trưng bày là meo giống nấm LC3. Giống nấm này được chính các thành viên trong đội thực hiện kỹ thuật nhân giống và áp dụng công nghệ truy xuất nguồn gốc PCR nên người dùng hoàn toàn có thể yên tâm về tính minh bạch của nguồn gốc giống. Quả thể cho ra từ meo giống LC3 có kích thước to, màu nâu sẫm, khi dùng sẽ có vị đắng chát.",
+            audio: "audio.nguon_goc_lc3.mp3"
         },
         {
-            keywords: ["nguồn gốc", "giống nấm", "tên giống","nấm này đến từ đâu"],
-            reply: "Meo giống hiện tại đội đang trưng bày là  là meo giống nấm linh chi LC3. Giống nấm này được chính các thành viên trong đội thực hiện kỹ thuật nhân giống và áp dụng công nghệ truy xuất nguồn gốc PCR nên người dùng hoàn toàn có thể yên tâm về tính minh bạch của nguồn gốc giống. Quả thể cho ra từ meo giống LC3 có kích thước to , màu nâu sẫm , khi dùng sẽ có vị đắng.",
-            audio: "audio.nguon_goc_nam.mp3"
+            keywords: ["nhiễm tạp", "mốc", "đốm xanh", "mùi thối", "xử lý", "tiêu hủy", "dấu hiệu"],
+            reply: "Để phát hiện meo giống bị nhiễm tạp, anh/chị có thể quan sát các dấu hiệu như các đốm mốc xanh, vàng, đen xuất hiện trên vùng tơ nấm trắng hoặc bám quanh cơ chất. Hoặc meo giống có mùi thối đậm đặc (thông thường meo giống sẽ có mùi mốc nhẹ đặc trưng). Cách tốt nhất để xử lý meo giống nhiễm là tiêu hủy meo giống đó và khử trùng các dụng cụ, trang thiết bị đã từng tiếp xúc để tránh lây lan.",
+            audio: "audio.nhiem_tap.mp3"
         },
         {
-            keywords: ["nhiễm tạp", "mốc xanh", "mùi thối" , "mốc đen", "hư hỏng", "ẩm mốc",]
-            reply: "Để phát hiện meo giống bị nhiễm tạp anh/chị có thể quan sát các dấu hiệu sau  :  các đốm mốc xanh , vàng, đen xuất hiện trên vùng tơ nấm trắng hoặc bám quanh cơ chất đây là dấu hiệu rõ ràng nhất cho biết meo giống của anh/chị đã bị nhiễm tạp hoặc meo giống có mùi thối đậm đặc. Thông thường meo giống sẽ có mùi mốc nhẹ đặc trưng nhưng nếu bị nhiễm nấm tạp sẽ sinh ra mùi thôí. Cách tốt nhất để xử lí meo giống nhiễm là tiêu huỷ meo giống đó và khử trùng các dụng cụ , trang thiết bị đã từng tiếp xúc để tránh lây lan", 
-            audio: "audio.meo_giong_bi_nhiem_benh.mp3"
+            keywords: ["ăn kín", "kín bịch", "kín phôi", "mấy ngày kín"],
+            reply: "Sau khi nấm đã bắt đầu chạy tơ thì khoảng từ 25 đến 30 ngày thì tơ nấm sẽ ăn kín bịch phôi.",
+            audio: "audio.an_kin_phoi.mp3"
         },
         {
-            keywords: ["ăn được không", "xào nấu", "làm thực phẩm", "chế biến món ăn"],
-            reply: "Khác với các loại nấm khác . Nấm linh chi có vị đắng chát do có dược tính cao đồng thời thịt nấm dai và cứng nên  không thể làm thực phẩm mà thường được chế biến để lam trà , làm bột , chiết xuất.",
+            keywords: ["ăn được không", "thực phẩm", "đắng", "dai", "cứng", "chế biến", "vị"],
+            reply: "Khác với các loại nấm khác, nấm Linh Chi có vị đắng chát do có dược tính cao, đồng thời thịt nấm dai và cứng nên ít được sử dụng làm thực phẩm, mà thường được chế biến để làm trà, làm bột, chiết xuất.",
             audio: "audio.linhchi_an_duoc_khong.mp3"
         },
         {
-            keywords: ["khi nào tơ nấm ăn kín phôi", "thời gian phát triển", "sau khi chạy tơ", "thời gian ăn tơ"],
-            reply: "Sau khi cấy giống thì tơ nấm cần khoảng 25-30 ngày để ăn kín phô.i",
-            audio: "audio.khi_nao_to_nam_an_kin_phoi.mp3"
-        },
-        {
-            keywords: ["điều kiện bảo quản", "bảo quản", "độ ẩm", "môi trường"],
-            reply: "Meo giống mua về cần được bảo quản trong môi trường thoáng mát , nhiệt độ vừa phải , tránh ánh sáng trực tiếp. Đặc biệt lưu ý không được để meo giống bị ướt hoặc để meo trong môi trường ẩm thấp vì sẽ tạo điều kiện thuận lợi cho các loại nấm mốc phát triển gây nhiễm tạp.",
+            keywords: ["bảo quản", "môi trường", "meo", "nhiệt độ", "ẩm", "nhiễm"],
+            reply: "Meo giống mua về cần được bảo quản trong môi trường thoáng mát, nhiệt độ vừa phải, tránh ánh sáng trực tiếp. Đặc biệt lưu ý không được để meo giống bị ướt hoặc để meo trong môi trường ẩm thấp vì sẽ tạo điều kiện thuận lợi cho các loại nấm mốc phát triển gây nhiễm tạp.",
             audio: "audio.dieu_kien_bao_quan.mp3"
         },
         {
-            keywords: ["cơ chất", "trồng trên đâu", "trồng thử nghiệm", "mủn cưa", "trồng trên đâu là tốt nhất"],
-            reply: "Trong quá trình trồng thử nghiệm nhóm nhận thấy meo giống nấm linh chi hoạt động tốt trên cơ chất là mùn cưa cao su.Anh/chị cũng có thể trồng trên các nền mùn cưa từ các cây không chứa tinh dầu khác."
+            keywords: ["cơ chất", "mùn cưa", "trồng", "thử nghiệm", "cao su", "thay thế"],
+            reply: "Qua quá trình trồng thử nghiệm, nhóm nhận thấy meo giống nấm LC3 hoạt động tốt trên cơ chất là mùn cưa cao su. Tuy nhiên, bạn vẫn có thể thay thế bằng mùn cưa của các loại cây thân không chứa tinh dầu để làm cơ chất cho nấm.",
             audio: "audio.co_chat.mp3"
-        },
-        {
-            keywords: ["công dụng", "tác dụng", "ngủ", "tim", "sức khỏe", "tốt cho", "lợi ích"],
-            reply: "Mỗi ngày dùng một cốc trà nấm Linh Chi sẽ giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.",
-            audio: "audio.cach_su-dung.mp3"
         }
     ];
-  const DEFAULT_REPLY = {
-        reply: "Xin lỗi tôi vẵn chưa hiểu lắm anh chị có thể cung cấp thêm thông tin về câu hỏi được không ạ.?",
+
+    // CÂU TRẢ LỜI MẶC ĐỊNH KHI KHÔNG CÓ DỮ LIỆU
+    const DEFAULT_REPLY = {
+        reply: "Xin lỗi, tôi chưa hiểu rõ ý anh/chị lắm. Anh/chị có thể cung cấp thêm thông tin về câu hỏi được không?",
         audio: "audio.khong_hieu.mp3"
     };
-    
+
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
     const micBtn = document.getElementById('micBtn');
@@ -149,51 +164,57 @@
 
     let currentAudio = null;
 
-    // SỰ KIỆN GỬI TIN NHẮN
     sendBtn.addEventListener('click', sendMessage);
     userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
     });
 
-    // WEB SPEECH API (MICRO)
+    // CẤU HÌNH WEB SPEECH API (NHẬN DIỆN GIỌNG NÓI)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let isRecording = false;
 
     if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.lang = 'vi-VN';
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        
-        recognition.onstart = () => { 
-            isRecording = true; 
-            micBtn.classList.add('recording'); 
-        };
-        
-        recognition.onend = () => { 
-            isRecording = false; 
-            micBtn.classList.remove('recording'); 
-        };
-        
-        recognition.onresult = (e) => { 
-            userInput.value = e.results[0][0].transcript; 
-            sendMessage(); 
-        };
+        try {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'vi-VN';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            
+            recognition.onstart = () => { 
+                isRecording = true; 
+                micBtn.classList.add('recording'); 
+            };
+            
+            recognition.onend = () => { 
+                isRecording = false; 
+                micBtn.classList.remove('recording'); 
+            };
+            
+            recognition.onresult = (e) => { 
+                userInput.value = e.results[0][0].transcript; 
+                sendMessage(); 
+            };
 
-        recognition.onerror = (e) => { 
-            isRecording = false; 
-            micBtn.classList.remove('recording'); 
-            if (e.error === 'not-allowed') {
-                alert("Bạn chưa cấp quyền Micro! Bấm vào biểu tượng Ổ khoá bên trái thanh địa chỉ để Cho phép (Allow) Micro.");
-            }
-        };
+            recognition.onerror = (e) => { 
+                isRecording = false; 
+                micBtn.classList.remove('recording'); 
+                if (e.error === 'not-allowed') {
+                    alert("Chưa được cấp quyền Micro! Bấm vào biểu tượng Ổ khóa trên thanh địa chỉ để Cho phép (Allow) Micro.");
+                }
+            };
+        } catch (err) {
+            console.error("Lỗi khởi tạo SpeechRecognition:", err);
+        }
     } else {
         micBtn.style.display = 'none';
     }
 
     micBtn.addEventListener('click', () => {
-        if (!recognition) return;
+        if (!recognition) {
+            alert("Trình duyệt không hỗ trợ nhận diện giọng nói. Hãy dùng trình duyệt Google Chrome!");
+            return;
+        }
         if (isRecording) {
             recognition.stop();
         } else {
@@ -205,30 +226,16 @@
         }
     });
 
-    // HÀM HIỂN THỊ TIN NHẮN
-    function addMessage(text, sender, imageUrl = null) {
+    // THÊM BONG BÓNG TIN NHẮN
+    function addMessage(text, sender) {
         const msgDiv = document.createElement('div');
         msgDiv.classList.add('message', sender);
-        
-        const textNode = document.createTextNode(text);
-        msgDiv.appendChild(textNode);
-
-        if (imageUrl) {
-            const img = document.createElement('img');
-            img.src = imageUrl;
-            img.classList.add('msg-image');
-            img.alt = "Hình ảnh đính kèm";
-            img.onerror = function() {
-                this.src = 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&q=80';
-            };
-            msgDiv.appendChild(img);
-        }
-
+        msgDiv.appendChild(document.createTextNode(text));
         chatBox.appendChild(msgDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // TÌM CÂU TRẢ LỜI PHÙ HỢP
+    // KHẮC PHỤC LỖI VÀ TÌM DỮ LIỆU
     function getBotData(text) {
         const lowerText = text.toLowerCase();
         for (const item of KNOWLEDGE_BASE) {
@@ -239,7 +246,7 @@
         return DEFAULT_REPLY;
     }
 
-    // PHÁT FILE MP3 (HOẶC ĐỌC TIẾNG VIỆT DỰ PHÒNG)
+    // PHÁT FILE ÂM THANH MP3
     function playAudioFile(audioSrc, fallbackText) {
         if (currentAudio) {
             currentAudio.pause();
@@ -272,7 +279,7 @@
 
         setTimeout(() => {
             const botData = getBotData(text);
-            addMessage(botData.reply, 'bot', botData.image);
+            addMessage(botData.reply, 'bot');
             playAudioFile(botData.audio, botData.reply);
         }, 300);
     }
