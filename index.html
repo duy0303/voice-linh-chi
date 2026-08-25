@@ -3,31 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trợ lí linh chi AI</title>
+    <title>Tư Vấn Nấm Linh Chi AI</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .chat-card { background: #fff; width: 100%; max-width: 480px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; height: 90vh; }
+        body { background-color: #f4f6f9; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; gap: 16px; }
+        
+        /* BẢNG MINH CHỨNG TÁCH RIÊNG BÊN NGOÀI KHUNG CHAT */
+        .cert-card { background: #fff; border: 1px solid #e2d2b6; border-radius: 16px; padding: 16px; width: 100%; max-width: 480px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-size: 0.85rem; color: #333; }
+        .cert-title { font-weight: bold; color: #8b1e0f; font-size: 0.95rem; margin-bottom: 10px; text-align: center; text-transform: uppercase; border-bottom: 1px dashed #e2d2b6; padding-bottom: 6px; }
+        .cert-body { display: flex; gap: 12px; align-items: center; }
+        .cert-img { width: 90px; height: 90px; border-radius: 8px; object-fit: cover; border: 1px solid #ccc; flex-shrink: 0; }
+        .cert-info { display: flex; flex-direction: column; gap: 4px; }
+        .cert-item { line-height: 1.35; }
+        .cert-label { font-weight: bold; color: #555; }
+        .highlight { color: #2e7d32; font-weight: bold; }
+
+        /* KHUNG CHAT SẢN PHẨM */
+        .chat-card { background: #fff; width: 100%; max-width: 480px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; height: 75vh; }
         .chat-header { background: #8b1e0f; color: #fff; padding: 16px; text-align: center; }
         .chat-header h2 { font-size: 1.2rem; margin-bottom: 4px; }
         .chat-header p { font-size: 0.8rem; opacity: 0.8; }
         .chat-box { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        
-        /* Bảng minh chứng nguồn gốc */
-        .cert-card { background: #fdfbf7; border: 1px solid #e2d2b6; border-radius: 10px; padding: 12px; font-size: 0.85rem; color: #333; }
-        .cert-title { font-weight: bold; color: #8b1e0f; font-size: 0.9rem; margin-bottom: 8px; text-align: center; text-transform: uppercase; border-bottom: 1px dashed #e2d2b6; padding-bottom: 4px; }
-        .cert-body { display: flex; gap: 10px; align-items: center; }
-        .cert-img { width: 90px; height: 90px; border-radius: 6px; object-fit: cover; border: 1px solid #ccc; flex-shrink: 0; }
-        .cert-info { display: flex; flex-direction: column; gap: 4px; }
-        .cert-item { line-height: 1.3; }
-        .cert-label { font-weight: bold; color: #555; }
-        .highlight { color: #2e7d32; font-weight: bold; }
 
         /* Tin nhắn chat */
         .message { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.4; }
         .bot { background: #f0f0f0; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
         .user { background: #8b1e0f; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .msg-image { width: 100%; max-width: 220px; border-radius: 8px; margin-top: 8px; display: block; }
+        
+        /* Hiển thị ảnh trong câu trả lời của Bot */
+        .msg-image { width: 100%; max-width: 220px; border-radius: 8px; margin-top: 8px; display: block; border: 1px solid #ddd; }
         
         /* Thanh điều khiển */
         .controls { padding: 16px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: center; }
@@ -40,6 +44,21 @@
 </head>
 <body>
 
+<!-- 1. BẢNG MINH CHỨNG NGUỒN GỐC TÁCH BÊN NGOÀI KHUNG CHAT -->
+<div class="cert-card">
+    <div class="cert-title">📜 MINH CHỨNG NGUỒN GỐC SẢN PHẨM</div>
+    <div class="cert-body">
+        <img class="cert-img" src="tralihchi.jpg" alt="Minh chứng LC3" onerror="this.src='https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=200&q=80'">
+        <div class="cert-info">
+            <div class="cert-item"><span class="cert-label">Giống nấm:</span> Linh Chi LC3</div>
+            <div class="cert-item"><span class="cert-label">Đơn vị nhân giống & nuôi trồng:</span> Đội Trái Tim Xanh</div>
+            <div class="cert-item"><span class="cert-label">Kiểm tra trình tự gene:</span> Ngân hàng gene NCBI</div>
+            <div class="cert-item"><span class="cert-label">Kết quả:</span> <span class="highlight">Trùng khớp với Ganoderma Multipileum</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. KHUNG CHAT TƯ VẤN KHÁCH HÀNG -->
 <div class="chat-card">
     <div class="chat-header">
         <h2>Trợ Lý Nấm Linh Chi</h2>
@@ -47,21 +66,6 @@
     </div>
     
     <div class="chat-box" id="chatBox">
-        <!-- BẢNG MINH CHỨNG NGUỒN GỐC GIAO DIỆN -->
-        <div class="cert-card">
-            <div class="cert-title">📜 Minh Chứng Nguồn Gốc Sản Phẩm</div>
-            <div class="cert-body">
-
-                <img class="cert-img" src="mihchug1.jpg" alt="Nấm Linh Chi LC3">
-                <div class="cert-info">
-                    <div class="cert-item"><span class="cert-label">Giống nấm:</span> Linh Chi LC3</div>
-                    <div class="cert-item"><span class="cert-label">Đơn vị nhân giống & nuôi trồng:</span> Đội Trái Tim Xanh</div>
-                    <div class="cert-item"><span class="cert-label">Kiểm tra trình tự gene:</span> Ngân hàng gene NCBI</div>
-                    <div class="cert-item"><span class="cert-label">Kết quả:</span> <span class="highlight">Trùng khớp với Ganoderma Multipileum</span></div>
-                </div>
-            </div>
-        </div>
-
         <div class="message bot">Xin chào! Tôi có thể giúp gì cho bạn về sản phẩm Nấm Linh Chi?</div>
     </div>
 
@@ -70,18 +74,16 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
         </button>
         <input type="text" id="userInput" class="input-text" placeholder="Nhập hoặc nói câu hỏi..." onkeypress="if(event.key==='Enter') sendMessage()">
-        <button class="btn-send" onclick="sendMessage()">Gửi</button>
+        <button class="btn-send" id="sendBtn" onclick="sendMessage()">Gửi</button>
     </div>
 </div>
 
 <script>
-    // Cơ sở dữ liệu kiến thức AI
+    // CƠ SỞ DỮ LIỆU KIẾN THỨC AI (ĐÃ BỔ SUNG TRƯỜNG "image: tralihchi.jpg")
     const KNOWLEDGE_BASE = [
-        {
-            keywords: ["dùng", "sử dụng", "pha", "cắt", "lát", "chế biến", "cách dùng", "uống", "như thế nào"],
-            reply: "Hiện tại, nấm Linh Chi đóng hộp của chúng tôi có thể dùng theo cách cắt lát pha trà. Mỗi lần dùng có thể cắt 2 đến 3 lát mỏng dài khoảng 2 đốt ngón tay và pha với một lượng nước sôi vừa phải. Mỗi ngày dùng một cốc sẽ giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.",
+        reply: "Hiện tại, nấm Linh Chi đóng hộp của chúng tôi có thể dùng theo cách cắt lát pha trà. Mỗi lần dùng có thể cắt 2 đến 3 lát mỏng dài khoảng 2 đốt ngón tay và pha với một lượng nước sôi vừa phải. Mỗi ngày dùng một cốc sẽ giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.",
             audio: "audio.cach_su-dung.mp3",
-            image: "tralihchi.jpg"
+            image: "tralihchi.jpg" // Ảnh đính kèm theo câu trả lời
         },
         {
             keywords: ["công dụng", "tác dụng", "lợi ích", "ngủ", "tim", "sức khỏe", "tốt cho"],
@@ -90,15 +92,16 @@
             image: "tralihchi.jpg"
         },
         {
-            keywords: ["nguồn gốc", "xuất xứ", "ncbi", "lc3", "trái tim xanh", "gene", "loại nấm", "giống"],
-            reply: "Nấm Linh Chi của chúng tôi thuộc giống LC3, được đội Trái Tim Xanh nhân giống và nuôi trồng. Sản phẩm đã qua kiểm tra trình tự gene trên ngân hàng gene NCBI cho kết quả trùng khớp với Ganoderma Multipelium.",
-            audio: ""
+            keywords: ["nguồn gốc", "xuất xứ", "ncbi", "lc3", "trái tim xanh", "gene", "multipileum"],
+            reply: "Nấm Linh Chi của chúng tôi thuộc giống LC3, được đội Trái Tim Xanh nhân giống và nuôi trồng. Sản phẩm đã qua kiểm tra trình tự gene trên ngân hàng gene NCBI cho kết quả trùng khớp với Ganoderma Multipileum.",
+            audio: "audio.cach_su-dung.mp3",
+            image: "mihchug1.jpg"
         }
     ];
 
     const DEFAULT_REPLY = {
-        reply: "Sản phẩm nấm Linh Chi đóng hộp giống LC3 (Ganoderma Lucidum) dùng bằng cách cắt 2-3 lát mỏng pha nước sôi. Uống 1 cốc mỗi ngày giúp cải thiện giấc ngủ và điều hòa tim mạch.",
-        audio: "audio.cach_su-dung.mp3",
+        reply: "Sản phẩm nấm Linh Chi đóng hộp giống LC3 (Ganoderma Multipileum) dùng bằng cách cắt 2-3 lát mỏng pha nước sôi. Uống 1 cốc mỗi ngày giúp cải thiện giấc ngủ và điều hòa tim mạch.",
+        audio: "audio.cach_su-dung.wav",
         image: "tralihchi.jpg"
     };
 
@@ -108,7 +111,7 @@
 
     let currentAudio = null;
 
-    // Web Speech API (STT Free trong Browser)
+    // Web Speech API (STT Nhận diện giọng nói)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let isRecording = false;
@@ -116,20 +119,49 @@
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.lang = 'vi-VN';
+        recognition.continuous = false;
+        recognition.interimResults = false;
         
-        recognition.onstart = () => { isRecording = true; micBtn.classList.add('recording'); };
-        recognition.onend = () => { isRecording = false; micBtn.classList.remove('recording'); };
-        recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; sendMessage(); };
-        recognition.onerror = () => { isRecording = false; micBtn.classList.remove('recording'); };
+        recognition.onstart = () => { 
+            isRecording = true; 
+            micBtn.classList.add('recording'); 
+        };
+        
+        recognition.onend = () => { 
+            isRecording = false; 
+            micBtn.classList.remove('recording'); 
+        };
+        
+        recognition.onresult = (e) => { 
+            userInput.value = e.results[0][0].transcript; 
+            sendMessage(); 
+        };
+
+        recognition.onerror = (e) => { 
+            isRecording = false; 
+            micBtn.classList.remove('recording'); 
+            if (e.error === 'not-allowed') {
+                alert("Vui lòng cho phép trình duyệt truy cập Micro để nói!");
+            }
+        };
     } else {
         micBtn.style.display = 'none';
     }
 
     micBtn.addEventListener('click', () => {
         if (!recognition) return;
-        isRecording ? recognition.stop() : recognition.start();
+        if (isRecording) {
+            recognition.stop();
+        } else {
+            try {
+                recognition.start();
+            } catch (err) {
+                console.log("Mic đang lắng nghe...", err);
+            }
+        }
     });
 
+    // Hàm chèn tin nhắn chữ + hình ảnh vào bong bóng Chat
     function addMessage(text, sender, imageUrl = null) {
         const msgDiv = document.createElement('div');
         msgDiv.classList.add('message', sender);
@@ -137,11 +169,16 @@
         const textNode = document.createTextNode(text);
         msgDiv.appendChild(textNode);
 
+        // Hiển thị ảnh nếu câu trả lời có đường dẫn hình ảnh
         if (imageUrl) {
             const img = document.createElement('img');
             img.src = imageUrl;
             img.classList.add('msg-image');
-            img.alt = "Hình ảnh minh họa";
+            img.alt = "Hình ảnh minh họa Nấm Linh Chi";
+            // Tự động dùng ảnh mặc định online nếu file ảnh cục bộ lỗi
+            img.onerror = function() {
+                this.src = 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&q=80';
+            };
             msgDiv.appendChild(img);
         }
 
@@ -159,6 +196,7 @@
         return DEFAULT_REPLY;
     }
 
+    // Phát file âm thanh audio.cach_su-dung.mp3
     function playAudioFile(audioSrc, fallbackText) {
         if (currentAudio) {
             currentAudio.pause();
@@ -191,5 +229,13 @@
 
         setTimeout(() => {
             const botData = getBotData(text);
+            // Gửi tin nhắn trả lời kèm hình ảnh tralihchi.jpg
             addMessage(botData.reply, 'bot', botData.image);
-            playAudioF
+            // Phát file âm thanh audio.cach_su-dung.mp3
+            playAudioFile(botData.audio, botData.reply);
+        }, 300);
+    }
+</script>
+</body>
+</html>
+            
