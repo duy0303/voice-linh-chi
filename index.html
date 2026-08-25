@@ -3,160 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Trợ Lý Voice CSKH - Nấm Linh Chi</title>
+    <title>Tư Vấn Nấm Linh Chi AI</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            background: #f0f2f5; 
-        }
-        .card { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 16px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
-            width: 100%; 
-            max-width: 500px; 
-            text-align: center; 
-        }
-        h2 { color: #2c3e50; margin-bottom: 20px; }
-        button { 
-            background: #007bff; 
-            color: white; 
-            border: none; 
-            padding: 14px 28px; 
-            border-radius: 30px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: bold; 
-            margin-bottom: 20px; 
-            transition: all 0.3s ease; 
-        }
-        button:hover { background: #0056b3; }
-        button.active { background: #dc3545; animation: pulse 1.5s infinite; }
-        .box-container { text-align: left; margin-top: 10px; }
-        .label { font-weight: bold; color: #555; margin-bottom: 5px; font-size: 14px; }
-        .box { 
-            padding: 12px 15px; 
-            border: 1px solid #e0e0e0; 
-            border-radius: 8px; 
-            background: #fafafa; 
-            min-height: 40px; 
-            margin-bottom: 15px; 
-            font-size: 15px; 
-            line-height: 1.5; 
-            word-wrap: break-word; 
-        }
-        .ai-reply { background: #e7f3ff; border-color: #b6d4fe; color: #084298; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .chat-card { background: #fff; width: 100%; max-width: 480px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; height: 90vh; }
+        .chat-header { background: #8b1e0f; color: #fff; padding: 16px; text-align: center; }
+        .chat-header h2 { font-size: 1.2rem; margin-bottom: 4px; }
+        .chat-header p { font-size: 0.8rem; opacity: 0.8; }
+        .chat-box { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
-        }
+        /* Bảng minh chứng nguồn gốc */
+        .cert-card { background: #fdfbf7; border: 1px solid #e2d2b6; border-radius: 10px; padding: 12px; font-size: 0.85rem; color: #333; }
+        .cert-title { font-weight: bold; color: #8b1e0f; font-size: 0.9rem; margin-bottom: 8px; text-align: center; text-transform: uppercase; border-bottom: 1px dashed #e2d2b6; padding-bottom: 4px; }
+        .cert-body { display: flex; gap: 10px; align-items: center; }
+        .cert-img { width: 90px; height: 90px; border-radius: 6px; object-fit: cover; border: 1px solid #ccc; flex-shrink: 0; }
+        .cert-info { display: flex; flex-direction: column; gap: 4px; }
+        .cert-item { line-height: 1.3; }
+        .cert-label { font-weight: bold; color: #555; }
+        .highlight { color: #2e7d32; font-weight: bold; }
+
+        /* Tin nhắn chat */
+        .message { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.4; }
+        .bot { background: #f0f0f0; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .user { background: #8b1e0f; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg-image { width: 100%; max-width: 220px; border-radius: 8px; margin-top: 8px; display: block; }
+        
+        /* Thanh điều khiển */
+        .controls { padding: 16px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: center; }
+        .btn-mic { background: #8b1e0f; border: none; color: white; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
+        .btn-mic.recording { background: #dc3545; animation: pulse 1.2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        .input-text { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 24px; outline: none; }
+        .btn-send { background: #333; border: none; color: white; padding: 10px 16px; border-radius: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Trợ Lý Tư Vấn Nấm Linh Chi</h2>
-    <button id="btn-record">🎤 Bấm để hỏi AI</button>
+<div class="chat-card">
+    <div class="chat-header">
+        <h2>Trợ Lý Nấm Linh Chi</h2>
+        <p>Hỏi đáp bằng giọng nói, hình ảnh & âm thanh</p>
+    </div>
+    
+    <div class="chat-box" id="chatBox">
+        <!-- BẢNG MINH CHỨNG NGUỒN GỐC GIAO DIỆN -->
+        <div class="cert-card">
+            <div class="cert-title">📜 Minh Chứng Nguồn Gốc Sản Phẩm</div>
+            <div class="cert-body">
+                <!-- Thay link anh_nam_linh_chi.jpg bằng đường dẫn ảnh thực tế của bạn -->
+                <img class="cert-img" src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=200&q=80" alt="Nấm Linh Chi LC3">
+                <div class="cert-info">
+                    <div class="cert-item"><span class="cert-label">Giống nấm:</span> Linh Chi LC3</div>
+                    <div class="cert-item"><span class="cert-label">Đơn vị nhân giống & nuôi trồng:</span> Đội Trái Tim Xanh</div>
+                    <div class="cert-item"><span class="cert-label">Kiểm tra trình tự gene:</span> Ngân hàng gene NCBI</div>
+                    <div class="cert-item"><span class="cert-label">Kết quả:</span> <span class="highlight">Trùng khớp với Ganoderma Lucidum</span></div>
+                </div>
+            </div>
+        </div>
 
-    <div class="box-container">
-        <div class="label">🗣️ Bạn hỏi:</div>
-        <div id="user-text" class="box">Đang chờ bạn nói...</div>
+        <div class="message bot">Xin chào! Tôi có thể giúp gì cho bạn về sản phẩm Nấm Linh Chi đóng hộp?</div>
+    </div>
 
-        <div class="label">🤖 AI Trả lời:</div>
-        <div id="ai-text" class="box ai-reply">Chưa có phản hồi...</div>
+    <div class="controls">
+        <button class="btn-mic" id="micBtn" title="Nhấn để nói">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <input type="text" id="userInput" class="input-text" placeholder="Nhập hoặc nói câu hỏi..." onkeypress="if(event.key==='Enter') sendMessage()">
+        <button class="btn-send" onclick="sendMessage()">Gửi</button>
     </div>
 </div>
 
 <script>
-    const btnRecord = document.getElementById('btn-record');
-    const userTextBox = document.getElementById('user-text');
-    const aiTextBox = document.getElementById('ai-text');
-
-    // 1. KỊCH BẢN TƯ VẤN NẤM LINH CHI (ĐÃ CẬP NHẬT FILE .MP3)
-    const scenarios = [
+    // Cơ sở dữ liệu kiến thức AI
+    const KNOWLEDGE_BASE = [
         {
-            keywords: [
-                'cách dùng', 'sử dụng', 'pha trà', 'dùng thế nào', 'uống thế nào','chế biến', 'linh chi', 'nấm linh chi', 'tác dụng', 'giấc ngủ', 'tim mạch'
-            ],
-            // Đường dẫn file MP3 nằm trực tiếp ở nhánh main / thư mục gốc
-            audioFile: 'audio.cach_su-dung.mp3',
-            displayText: 'Hiện tại, nấm Linh Chi đóng hộp của chúng tôi có thể dùng theo cách cắt lát pha trà. Mỗi lần dùng có thể cắt 2 đến 3 lát mỏng dài khoảng hai đốt ngón tay và pha với một lượng nước sôi vừa phải. Mỗi ngày dùng một cốc sẽ giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.'
+            keywords: ["dùng", "sử dụng", "pha", "cắt", "lát", "chế biến", "cách dùng", "uống", "như thế nào"],
+            reply: "Hiện tại, nấm Linh Chi đóng hộp của chúng tôi có thể dùng theo cách cắt lát pha trà. Mỗi lần dùng có thể cắt 2 đến 3 lát mỏng dài khoảng 2 đốt ngón tay và pha với một lượng nước sôi vừa phải. Mỗi ngày dùng một cốc sẽ giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.",
+            audio: "audio.cach_su-dung.wav",
+            image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&q=80"
+        },
+        {
+            keywords: ["công dụng", "tác dụng", "lợi ích", "ngủ", "tim", "sức khỏe", "tốt cho"],
+            reply: "Mỗi ngày dùng một cốc trà nấm Linh Chi giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.",
+            audio: "audio.cach_su-dung.wav",
+            image: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=400&q=80"
+        },
+        {
+            keywords: ["nguồn gốc", "xuất xứ", "ncbi", "lc3", "trái tim xanh", "gene", "loại nấm", "giống"],
+            reply: "Nấm Linh Chi của chúng tôi thuộc giống LC3, được đội Trái Tim Xanh nhân giống và nuôi trồng. Sản phẩm đã qua kiểm tra trình tự gene trên ngân hàng gene NCBI cho kết quả trùng khớp với Ganoderma Lucidum.",
+            audio: "audio.cach_su-dung.wav"
         }
     ];
 
-    const defaultScenario = {
-        audioFile: 'audio.cach_su-dung.mp3',
-        displayText: 'Dạ em chưa nghe rõ. Anh/chị có thể hỏi lại về cách sử dụng hoặc tác dụng của Nấm Linh Chi đóng hộp được không ạ?'
+    const DEFAULT_REPLY = {
+        reply: "Sản phẩm nấm Linh Chi đóng hộp giống LC3 (Ganoderma Lucidum) dùng bằng cách cắt 2-3 lát mỏng pha nước sôi. Uống 1 cốc mỗi ngày giúp cải thiện giấc ngủ và điều hòa tim mạch.",
+        audio: "audio.cach_su-dung.wav",
+        image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&q=80"
     };
+
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const micBtn = document.getElementById('micBtn');
 
     let currentAudio = null;
 
-    // 2. KHỞI TẠO CÔNG CỤ NHẬN DẠNG GIỌNG NÓI (WEB SPEECH API)
+    // Web Speech API (STT Free trong Browser)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isRecording = false;
 
-    if (!SpeechRecognition) {
-        alert("Trình duyệt không hỗ trợ Web Speech API! Vui lòng truy cập bằng Google Chrome hoặc Microsoft Edge.");
-    } else {
-        const recognition = new SpeechRecognition();
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
         recognition.lang = 'vi-VN';
+        
+        recognition.onstart = () => { isRecording = true; micBtn.classList.add('recording'); };
+        recognition.onend = () => { isRecording = false; micBtn.classList.remove('recording'); };
+        recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; sendMessage(); };
+        recognition.onerror = () => { isRecording = false; micBtn.classList.remove('recording'); };
+    } else {
+        micBtn.style.display = 'none';
+    }
 
-        btnRecord.addEventListener('click', () => {
-            if (currentAudio) { 
-                currentAudio.pause(); 
-                currentAudio.currentTime = 0;
+    micBtn.addEventListener('click', () => {
+        if (!recognition) return;
+        isRecording ? recognition.stop() : recognition.start();
+    });
+
+    function addMessage(text, sender, imageUrl = null) {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', sender);
+        
+        const textNode = document.createTextNode(text);
+        msgDiv.appendChild(textNode);
+
+        if (imageUrl) {
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.classList.add('msg-image');
+            img.alt = "Hình ảnh minh họa";
+            msgDiv.appendChild(img);
+        }
+
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function getBotData(text) {
+        const lowerText = text.toLowerCase();
+        for (const item of KNOWLEDGE_BASE) {
+            if (item.keywords.some(kw => lowerText.includes(kw))) {
+                return item;
             }
-            recognition.start();
-        });
-
-        recognition.onstart = () => {
-            btnRecord.textContent = "🔴 Đang lắng nghe...";
-            btnRecord.classList.add('active');
-        };
-
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript.toLowerCase();
-            userTextBox.textContent = event.results[0][0].transcript;
-
-            matchAndPlayAudio(transcript);
-        };
-
-        recognition.onend = () => {
-            btnRecord.textContent = "🎤 Bấm để hỏi AI";
-            btnRecord.classList.remove('active');
-        };
-
-        recognition.onerror = (event) => {
-            btnRecord.textContent = "🎤 Bấm để hỏi AI";
-            btnRecord.classList.remove('active');
-            userTextBox.textContent = "Lỗi nhận dạng âm thanh: " + event.error;
-        };
+        }
+        return DEFAULT_REPLY;
     }
 
-    // 3. HÀM XỬ LÝ KHỚP CÂU HỎI VÀ PHÁT AUDIO (.MP3)
-    function matchAndPlayAudio(inputText) {
-        const matched = scenarios.find(item => 
-            item.keywords.some(kw => inputText.includes(kw))
-        );
+    function playAudioFile(audioSrc, fallbackText) {
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+        }
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 
-        const target = matched ? matched : defaultScenario;
-
-        aiTextBox.textContent = target.displayText;
-
-        // Tải và phát file MP3
-        currentAudio = new Audio(target.audioFile);
-        currentAudio.play().catch(error => {console.error("Không thể phát file âm thanh:", error);
-            alert("Lỗi: Hãy chắc chắn bạn đã tải file '" + target.audioFile + "' lên thư mục chính (main) của GitHub!");
-        });
+        if (audioSrc) {
+            currentAudio = new Audio(audioSrc);
+            currentAudio.play().catch(() => speakFallbackText(fallbackText));
+        } else {
+            speakFallbackText(fallbackText);
+        }
     }
-</script>
 
-</body>
-</html>
+    function speakFallbackText(text) {
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'vi-VN';
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        addMessage(text, 'user');
+        userInput.value = '';
+
+        setTimeout(() => {
+            const botData = getBotData(text);
+            addMessage(botData.reply, 'bot', botData.image);
+            playAudioF
