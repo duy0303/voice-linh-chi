@@ -56,6 +56,15 @@
         .bot { background: #f0f0f0; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
         .user { background: #8b1e0f; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
         
+        /* ẢNH HIỂN THỊ TRONG CHAT */
+        .chat-reply-img { 
+            max-width: 100%; 
+            width: 180px; 
+            border-radius: 10px; 
+            margin-top: 8px; 
+            display: block; 
+        }
+
         /* ĐIỀU KHIỂN & MICRO */
         .controls { padding: 16px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center; }
         .btn-mic { background: #8b1e0f; border: none; color: white; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
@@ -151,10 +160,11 @@
         }
     ];
 
-    // CÂU TRẢ LỜI MẶC ĐỊNH KHI KHÔNG CÓ DỮ LIỆU
+    // CÂU TRẢ LỜI MẶC ĐỊNH KHI KHÔNG CÓ DỮ LIỆU (KÈM ẢNH LOI.JPG)
     const DEFAULT_REPLY = {
         reply: "Xin lỗi, tôi chưa hiểu rõ ý anh/chị lắm. Anh/chị có thể cung cấp thêm thông tin về câu hỏi được không?",
-        audio: "audio.khong_hieu.mp3"
+        audio: "audio.khong_hieu.mp3",
+        image: "loi.jpg"
     };
 
     const chatBox = document.getElementById('chatBox');
@@ -191,7 +201,7 @@
                 micBtn.classList.remove('recording'); 
             };
             
-            recognition.onresult = (e) => { 
+            recognition.onresult = (e) => {
                 userInput.value = e.results[0][0].transcript; 
                 sendMessage(); 
             };
@@ -226,11 +236,24 @@
         }
     });
 
-    // THÊM BONG BÓNG TIN NHẮN
-    function addMessage(text, sender) {
+    // THÊM BONG BÓNG TIN NHẮN (CÓ HỖ TRỢ KÈM ẢNH)
+    function addMessage(text, sender, imageUrl = null) {
         const msgDiv = document.createElement('div');
         msgDiv.classList.add('message', sender);
-        msgDiv.appendChild(document.createTextNode(text));
+        
+        // Thêm đoạn chữ
+        const textNode = document.createTextNode(text);
+        msgDiv.appendChild(textNode);
+
+        // Thêm ảnh nếu có
+        if (imageUrl) {
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.classList.add('chat-reply-img');
+            img.alt = 'Thông báo lỗi';
+            msgDiv.appendChild(img);
+        }
+
         chatBox.appendChild(msgDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
@@ -279,7 +302,8 @@
 
         setTimeout(() => {
             const botData = getBotData(text);
-            addMessage(botData.reply, 'bot');
+            // Truyền botData.image vào hàm addMessage
+            addMessage(botData.reply, 'bot', botData.image);
             playAudioFile(botData.audio, botData.reply);
         }, 300);
     }
