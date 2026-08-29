@@ -3,12 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trợ Lý Linh Chi AI</title>
+    <title>Trợ Lý AI Nấm Linh Chi</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background-color: #f4f6f9; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; gap: 20px; }
         
-        /* BẢNG THÔNG TIN CHUNG */
+        /* BẢNG THỜI TIẾT & DỰ BÁO (MÀU XANH DƯƠNG) */
+        .weather-card {
+            background: linear-gradient(135deg, #0d47a1 0%, #1976d2 100%);
+            color: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 10px 25px rgba(25, 118, 210, 0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .weather-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .weather-location {
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .weather-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-transform: capitalize;
+        }
+
+        /* THỜI TIẾT HIỆN TẠI */
+        .weather-body {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            text-align: center;
+        }
+
+        .weather-temp-main {
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .weather-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .weather-stat-value { font-weight: bold; font-size: 1.1rem; }
+        .weather-stat-label { font-size: 0.75rem; opacity: 0.85; }
+
+        /* KHU VỰC HIỂN THỊ DỰ BÁO NGÀY MAI */
+        .forecast-section {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .forecast-title { font-weight: bold; display: flex; align-items: center; gap: 6px; }
+
+        /* BẢNG THÔNG TIN CHUNG SẢN PHẨM */
         .cert-card { 
             background: #fff; 
             border: 2px solid #e2d2b6; 
@@ -34,7 +112,7 @@
         .cert-img { 
             width: 140px; 
             height: 140px; 
-            border-radius: 50%; /* Chuyển thành khung tròn cho phù hợp logo */
+            border-radius: 50%; 
             object-fit: cover; 
             border: 2px solid #ddd; 
             flex-shrink: 0; 
@@ -45,7 +123,7 @@
         .highlight { color: #2e7d32; font-weight: bold; }
 
         /* KHUNG CHAT AI */
-        .chat-card { background: #fff; width: 100%; max-width: 650px; border-radius: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; height: 65vh; }
+        .chat-card { background: #fff; width: 100%; max-width: 650px; border-radius: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; height: 60vh; }
         .chat-header { background: #8b1e0f; color: #fff; padding: 16px; text-align: center; }
         .chat-header h2 { font-size: 1.25rem; margin-bottom: 4px; }
         .chat-header p { font-size: 0.85rem; opacity: 0.85; }
@@ -55,32 +133,55 @@
         .message { max-width: 80%; padding: 12px 16px; border-radius: 14px; font-size: 1rem; line-height: 1.45; word-break: break-word; }
         .bot { background: #f0f0f0; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
         .user { background: #8b1e0f; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
-        
-        /* ẢNH HIỂN THỊ TRONG CHAT */
-        .chat-reply-img { 
-            max-width: 100%; 
-            width: 180px; 
-            border-radius: 10px; 
-            margin-top: 8px; 
-            display: block; 
-        }
+        .chat-reply-img { max-width: 100%; width: 180px; border-radius: 10px; margin-top: 8px; display: block; }
 
         /* ĐIỀU KHIỂN & MICRO */
         .controls { padding: 16px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center; }
-        .btn-mic { background: #8b1e0f; border: none; color: white; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
-        .btn-mic.recording { background: #dc3545; animation: pulse 1.2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        .btn-mic { background: #8b1e0f; border: none; color: white; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .input-text { flex: 1; padding: 12px 18px; border: 1px solid #ddd; border-radius: 24px; outline: none; font-size: 1rem; }
         .btn-send { background: #333; border: none; color: white; padding: 12px 20px; border-radius: 22px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
     </style>
 </head>
 <body>
 
-<!-- BẢNG THÔNG TIN CHUNG (ĐÃ CẬP NHẬT) -->
+<!-- BẢNG THỜI TIẾT HIỆN TẠI & DỰ BÁO (MÀU XANH DƯƠNG) -->
+<div class="weather-card">
+    <div class="weather-header">
+        <div class="weather-location">
+            📍 <span id="weatherCity">Đang định vị...</span>
+        </div>
+        <div class="weather-badge" id="weatherDesc">Tải dữ liệu...</div>
+    </div>
+    
+    <div class="weather-body">
+        <div class="weather-stat-item">
+            <span class="weather-stat-label">Hiện tại</span>
+            <div class="weather-temp-main" id="weatherTemp">--°</div>
+        </div>
+        <div class="weather-stat-item">
+            <span style="font-size: 1.5rem;">💧</span>
+            <span class="weather-stat-value" id="weatherHumidity">--%</span>
+            <span class="weather-stat-label">Độ ẩm</span>
+        </div>
+        <div class="weather-stat-item">
+            <span style="font-size: 1.5rem;">💨</span>
+            <span class="weather-stat-value" id="weatherWind">-- m/s</span>
+            <span class="weather-stat-label">Tốc độ gió</span>
+        </div>
+    </div>
+
+    <!-- KHU VỰC HIỂN THỊ DỰ BÁO NGÀY MAI -->
+    <div class="forecast-section">
+        <div class="forecast-title">🔮 Dự báo ngày mai:</div>
+        <div id="forecastText">Đang tính toán...</div>
+    </div>
+</div>
+
+<!-- BẢNG THÔNG TIN CHUNG SẢN PHẨM -->
 <div class="cert-card">
-    <div class="cert-title">THÔNG TIN CHUNG SẢN PHẨM</div>
+    <div class="cert-title">📋 THÔNG TIN CHUNG SẢN PHẨM</div>
     <div class="cert-body">
-        <img class="cert-img" src="logo.jpg">
+        <img class="cert-img" src="logo.jpg" alt="Logo Linh Chi AI" onerror="this.src='https://via.placeholder.com/140'">
         <div class="cert-info">
             <div class="cert-item"><span class="cert-label">🍄 Đơn vị quản lý:</span> Đội Trái Tim Xanh</div>
             <div class="cert-item"><span class="cert-label">🌱 Quản lý 3 giống:</span> <span class="highlight">LC1 • LC2 • LC3</span></div>
@@ -96,11 +197,9 @@
         <h2>Trợ Lý AI Nấm Linh Chi</h2>
         <p>Hỏi đáp bằng văn bản & giọng nói</p>
     </div>
-    
     <div class="chat-box" id="chatBox">
         <div class="message bot">Xin chào! Tôi có thể giúp gì cho anh/chị về kỹ thuật nuôi trồng và sử dụng Nấm Linh Chi?</div>
     </div>
-
     <div class="controls">
         <button class="btn-mic" id="micBtn" title="Nhấn để nói">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
@@ -111,6 +210,67 @@
 </div>
 
 <script>
+    // API Key OpenWeatherMap đã xác thực của bạn
+    const WEATHER_API_KEY = "1b9eb319e422018e186dd5ea8f66c655";
+
+    function fetchWeatherAndForecast(lat, lon) {
+        const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=vi&appid=${WEATHER_API_KEY}`;
+        const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&lang=vi&appid=${WEATHER_API_KEY}`;
+
+        // Lấy thời tiết hiện tại
+        fetch(currentWeatherUrl)
+            .then(res => res.json())
+            .then(data => {
+                if (data.cod === 200) {
+                    document.getElementById('weatherCity').innerText = data.name;
+                    document.getElementById('weatherDesc').innerText = data.weather[0].description;
+                    document.getElementById('weatherTemp').innerText = `${Math.round(data.main.temp)}°C`;
+                    document.getElementById('weatherHumidity').innerText = `${data.main.humidity}%`;
+                    document.getElementById('weatherWind').innerText = `${data.wind.speed} m/s`;
+                }
+            })
+            .catch(() => {
+                document.getElementById('weatherCity').innerText = "Lỗi kết nối thời tiết";
+            });
+
+        // Lấy dự báo ngày mai
+        fetch(forecastUrl)
+            .then(res => res.json())
+            .then(data => {
+                if (data.cod === "200") {
+                    const tomorrowData = data.list[8];
+                    const temp = Math.round(tomorrowData.main.temp);
+                    const desc = tomorrowData.weather[0].description;
+                    const humidity = tomorrowData.main.humidity;
+
+                    document.getElementById('forecastText').innerText = `${temp}°C, ${desc} (Độ ẩm: ${humidity}%)`;
+                }
+            })
+            .catch(() => {
+                document.getElementById('forecastText').innerText = "Không thể tải dự báo.";
+            });
+    }
+
+    // Tự động định vị GPS vị trí người dùng
+    function initGeolocation() {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    fetchWeatherAndForecast(position.coords.latitude, position.coords.longitude);
+                },
+                (error) => {
+                    // Mặc định TP.HCM nếu không cấp quyền vị trí
+                    document.getElementById('weatherCity').innerText = "TP. Hồ Chí Minh (Mặc định)";
+                    fetchWeatherAndForecast(10.7769, 106.7009);
+                }
+            );
+        } else {
+            document.getElementById('weatherCity').innerText = "Không hỗ trợ định vị";
+        }
+    }
+
+    initGeolocation();
+    
     // TOÀN BỘ CƠ SỞ DỮ LIỆU ÂM THANH
     const KNOWLEDGE_BASE = [
         {
