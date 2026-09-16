@@ -133,7 +133,6 @@
         .message { max-width: 80%; padding: 12px 16px; border-radius: 14px; font-size: 1rem; line-height: 1.45; word-break: break-word; }
         .bot { background: #f0f0f0; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
         .user { background: #8b1e0f; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .chat-reply-img { max-width: 100%; width: 180px; border-radius: 10px; margin-top: 8px; display: block; }
 
         /* ĐIỀU KHIỂN & MICRO */
         .controls { padding: 16px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center; }
@@ -217,12 +216,12 @@
     // -----------------------------------------------------------------
     const WEATHER_API_KEY = "1b9eb319e422018e186dd5ea8f66c655";
     
-    // !!! THAY API KEY GEMINI CỦA BẠN VÀO ĐÂY (Lấy từ https://aistudio.google.com) !!!
-    const GEMINI_API_KEY = "AQ.Ab8RN6I2fmspvqLZPVZedQGMn3IslIrAxZTOwhAJ2mtknCGTCg";
+    // API KEY OPENROUTER (Thay khóa sk-or-v1-... của bạn vào đây)
+    const OPENROUTER_API_KEY = "YOUR_OPENROUTER_API_KEY_HERE";
 
     const SYSTEM_INSTRUCTION = `
 Bạn là Trợ lý AI chuyên nghiệp của "Đội Trái Tim Xanh" về Nấm Linh Chi.
-Nhiệm vụ: Trả lời câu hỏi của người dùng một cách tự nhiên, lịch sự, chính xác và có tư duy.
+Nhiệm vụ: Trả lời câu hỏi của người dùng một cách tự nhiên, lịch sự, chính xác và ngắn gọn.
 
 Dưới đây là cơ sở tri thức chuẩn của dự án:
 TÀI LIỆU KIẾN THỨC TỔNG HỢP NẤM LINH CHI - ĐỘI TRÁI TIM XANH
@@ -252,7 +251,7 @@ TÀI LIỆU KIẾN THỨC TỔNG HỢP NẤM LINH CHI - ĐỘI TRÁI TIM XANH
 - Bảo quản meo: Nơi thoáng mát, tránh ánh sáng trực tiếp và ẩm thấp.
 - Liều dùng: 3-5g nấm khô/ngày (2-3 lát mỏng) hãm trà hoặc nấu mật ong/ngâm rượu. Không dùng quá 15g/ngày.
 
-Hãy trả lời ngắn gọn, trực diện, văn phong thân thiện, không dùng định dạng Markdown phức tạp để dễ phát giọng nói.
+LƯU Ý ĐẶC BIỆT: Trả lời ngắn gọn (dưới 3 câu), tự nhiên, không dùng bất kỳ ký tự định dạng Markdown nào (như dấu sao *, gạch đầu dòng -, gạch dưới _) để giọng đọc AI không bị đọc nhầm ký tự đặc biệt.
 `;
 
     // -----------------------------------------------------------------
@@ -312,14 +311,60 @@ Hãy trả lời ngắn gọn, trực diện, văn phong thân thiện, không d
     initGeolocation();
 
     // -----------------------------------------------------------------
-    // 3. GIAO TIẾP VỚI GEMINI AI VÀ TEXT-TO-SPEECH
+    // 3. THUẬT TOÁN ĐỌC GIỌNG NÓI TIẾNG VIỆT TỰ NHIÊN
+    // -----------------------------------------------------------------
+    let vietnameseVoice = null;
+
+    function loadVoices() {
+        if ('speechSynthesis' in window) {
+            const voices = window.speechSynthesis.getVoices();
+            // Lọc ưu tiên giọng nói Tiếng Việt tự nhiên nhất theo hệ điều hành/trình duyệt
+            vietnameseVoice = voices.find(voice => 
+                voice.lang.includes('vi') || voice.lang.includes('vi-VN') || voice.lang.includes('vi_VN')
+            );
+        }
+    }
+
+    if ('speechSynthesis' in window) {
+        loadVoices();
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); // Dừng câu đang đọc nếu có
+
+            // Làm sạch văn bản trước khi đọc (xóa link, biểu tượng, ký tự đặc biệt)
+            const cleanText = text
+                .replace(/https?:\/\/\S+/g, '')
+                .replace(/[*_#~`]/g, '')
+                .replace(/([.?!])\s*/g, "$1 "); // Thêm khoảng nghỉ tự nhiên sau dấu câu
+
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+
+            if (vietnameseVoice) {
+                utterance.voice = vietnameseVoice;
+            }
+
+            utterance.lang = 'vi-VN';
+            utterance.rate = 0.95; // Tốc độ nói hơi chậm lại một chút để chuẩn giọng tự nhiên
+            utterance.pitch = 1.0;
+            
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    // -----------------------------------------------------------------
+    // 4. GIAO TIẾP VỚI OPENROUTER API
     // -----------------------------------------------------------------
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
     const micBtn = document.getElementById('micBtn');
     const sendBtn = document.getElementById('sendBtn');
 
-    let chatHistory = [];
+    let chatHistory = [
+        { role: "system", content: SYSTEM_INSTRUCTION }
+    ];
 
     sendBtn.addEventListener('click', sendMessage);
     userInput.addEventListener('keypress', (e) => {
@@ -335,78 +380,45 @@ Hãy trả lời ngắn gọn, trực diện, văn phong thân thiện, không d
         return msgDiv;
     }
 
-    // ĐỌC VĂN BẢN CHUẨN TIẾNG VIỆT
-    function speakText(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel(); // Dừng câu đọc trước
-
-            const cleanText = text.replace(/https?:\/\/\S+/g, '').replace(/[*_#]/g, '');
-            const utterance = new SpeechSynthesisUtterance(cleanText);
-
-            // Tìm giọng đọc Tiếng Việt trong hệ thống
-            const voices = window.speechSynthesis.getVoices();
-            const vietnameseVoice = voices.find(voice => 
-                voice.lang.includes('vi') || voice.lang.includes('vi-VN') || voice.name.toLowerCase().includes('vietnam')
-            );
-
-            if (vietnameseVoice) {
-                utterance.voice = vietnameseVoice;
-            }
-
-            utterance.lang = 'vi-VN';
-            utterance.rate = 1.0;
-            utterance.pitch = 1.0;
-            
-            window.speechSynthesis.speak(utterance);
-        }
-    }
-
-    // Đảm bảo cập nhật danh sách giọng đọc khi trình duyệt sẵn sàng
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = () => {
-            window.speechSynthesis.getVoices();
-        };
-    }
-
-    // GOI GEMINI API
     async function fetchAIResponse(userQuery) {
-        if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
-            return "Bạn chưa dán GEMINI_API_KEY vào mã nguồn! Hãy lấy mã API từ https://aistudio.google.com và dán vào file index.html.";
+        if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === "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") {
+            return "Bạn chưa dán OPENROUTER_API_KEY vào mã nguồn! Hãy dán API Key của bạn vào biến OPENROUTER_API_KEY trong file HTML.";
         }
 
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        const endpoint = "https://openrouter.ai/api/v1/chat/completions";
 
-        chatHistory.push({ role: "user", parts: [{ text: userQuery }] });
+        chatHistory.push({ role: "user", content: userQuery });
 
         const requestBody = {
-            system_instruction: {
-                parts: [{ text: SYSTEM_INSTRUCTION }]
-            },
-            contents: chatHistory
+            model: "google/gemini-2.0-flash-lite-001:free", // Sử dụng mô hình miễn phí tốc độ cao của OpenRouter
+            messages: chatHistory
         };
 
         try {
             const response = await fetch(endpoint, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`
+                },
                 body: JSON.stringify(requestBody)
             });
 
             const data = await response.json();
             
-            if (data.candidates && data.candidates[0].content.parts[0].text) {
-                const aiReply = data.candidates[0].content.parts[0].text;
-                chatHistory.push({ role: "model", parts: [{ text: aiReply }] });
+            if (data.choices && data.choices[0].message.content) {
+                const aiReply = data.choices[0].message.content;
+                chatHistory.push({ role: "assistant", content: aiReply });
                 return aiReply;
             } else if (data.error) {
-                console.error("Lỗi Gemini API:", data.error);
+                console.error("Lỗi OpenRouter API:", data.error);
                 return `Lỗi API: ${data.error.message || "Vui lòng kiểm tra lại Key!"}`;
             } else {
                 return "Rất tiếc, tôi chưa thể xử lý câu hỏi này lúc này.";
             }
         } catch (error) {
             console.error("Lỗi kết nối AI:", error);
-            return "Lỗi kết nối mạng hoặc không thể gọi đến API của AI.";
+            return "Lỗi kết nối mạng hoặc không thể kết nối đến OpenRouter API.";
         }
     }
 
@@ -425,12 +437,12 @@ Hãy trả lời ngắn gọn, trực diện, văn phong thân thiện, không d
         loadingMsg.innerText = aiReply;
         sendBtn.disabled = false;
 
-        // Phát giọng nói
+        // Phát giọng nói tiếng Việt
         speakText(aiReply);
     }
 
     // -----------------------------------------------------------------
-    // 4. NHẬN DIỆN GIỌNG NÓI (VOICE-TO-TEXT)
+    // 5. NHẬN DIỆN GIỌNG NÓI (VOICE-TO-TEXT)
     // -----------------------------------------------------------------
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
