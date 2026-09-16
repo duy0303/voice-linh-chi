@@ -217,7 +217,7 @@
     const WEATHER_API_KEY = "1b9eb319e422018e186dd5ea8f66c655";
     
     // API KEY OPENROUTER (Thay khóa sk-or-v1-... của bạn vào đây)
-    const OPENROUTER_API_KEY = "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";
+    const OPENROUTER_API_KEY = "YOUR_OPENROUTER_API_KEY_HERE";
 
     const SYSTEM_INSTRUCTION = `
 Bạn là Trợ lý AI chuyên nghiệp của "Đội Trái Tim Xanh" về Nấm Linh Chi.
@@ -381,7 +381,7 @@ LƯU Ý ĐẶC BIỆT: Trả lời ngắn gọn (dưới 3 câu), tự nhiên, k
     }
 
     async function fetchAIResponse(userQuery) {
-        if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === "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") {
+        if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === "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") {
             return "Bạn chưa dán OPENROUTER_API_KEY vào mã nguồn! Hãy dán API Key của bạn vào biến OPENROUTER_API_KEY trong file HTML.";
         }
 
