@@ -133,20 +133,18 @@
         .message { max-width: 80%; padding: 12px 16px; border-radius: 14px; font-size: 1rem; line-height: 1.45; word-break: break-word; }
         .bot { background: #f0f0f0; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
         .user { background: #8b1e0f; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .chat-reply-img { max-width: 100%; width: 180px; border-radius: 10px; margin-top: 8px; display: block; }
 
         /* ĐIỀU KHIỂN & MICRO */
         .controls { padding: 16px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center; }
         .btn-mic { background: #8b1e0f; border: none; color: white; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .btn-mic.recording { background: #d32f2f; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
         .input-text { flex: 1; padding: 12px 18px; border: 1px solid #ddd; border-radius: 24px; outline: none; font-size: 1rem; }
         .btn-send { background: #333; border: none; color: white; padding: 12px 20px; border-radius: 22px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
-        .btn-send:disabled { background: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-<!-- BẢNG THỜI TIẾT HIỆN TẠI & DỰ BÁO -->
+<!-- BẢNG THỜI TIẾT HIỆN TẠI & DỰ BÁO (MÀU XANH DƯƠNG) -->
 <div class="weather-card">
     <div class="weather-header">
         <div class="weather-location">
@@ -172,6 +170,7 @@
         </div>
     </div>
 
+    <!-- KHU VỰC HIỂN THỊ DỰ BÁO NGÀY MAI -->
     <div class="forecast-section">
         <div class="forecast-title">🔮 Dự báo ngày mai:</div>
         <div id="forecastText">Đang tính toán...</div>
@@ -195,11 +194,11 @@
 <!-- KHUNG TƯ VẤN HỎI ĐÁP AI -->
 <div class="chat-card">
     <div class="chat-header">
-        <h2>Trợ Lý AI Nấm Linh Chi (Thông Minh)</h2>
+        <h2>Trợ Lý AI Nấm Linh Chi</h2>
         <p>Hỏi đáp bằng văn bản & giọng nói</p>
     </div>
     <div class="chat-box" id="chatBox">
-        <div class="message bot">Xin chào! Tôi là Trợ lý AI của Đội Trái Tim Xanh. Tôi có thể tư vấn thông minh về kỹ thuật trồng, định danh giống LC1, LC2, LC3 và cách dùng Nấm Linh Chi.</div>
+        <div class="message bot">Xin chào! Tôi có thể giúp gì cho anh/chị về kỹ thuật nuôi trồng và sử dụng Nấm Linh Chi?</div>
     </div>
     <div class="controls">
         <button class="btn-mic" id="micBtn" title="Nhấn để nói">
@@ -211,56 +210,14 @@
 </div>
 
 <script>
-    // -----------------------------------------------------------------
-    // 1. CẤU HÌNH API & DỮ LIỆU AI
-    // -----------------------------------------------------------------
+    // API Key OpenWeatherMap đã xác thực của bạn
     const WEATHER_API_KEY = "1b9eb319e422018e186dd5ea8f66c655";
-    
-    // API KEY OPENROUTER (Thay khóa sk-or-v1-... của bạn vào đây)
-    const OPENROUTER_API_KEY = "YOUR_OPENROUTER_API_KEY_HERE";
 
-    const SYSTEM_INSTRUCTION = `
-Bạn là Trợ lý AI chuyên nghiệp của "Đội Trái Tim Xanh" về Nấm Linh Chi.
-Nhiệm vụ: Trả lời câu hỏi của người dùng một cách tự nhiên, lịch sự, chính xác và ngắn gọn.
-
-Dưới đây là cơ sở tri thức chuẩn của dự án:
-TÀI LIỆU KIẾN THỨC TỔNG HỢP NẤM LINH CHI - ĐỘI TRÁI TIM XANH
-
-1. THÔNG TIN CÁC DÒNG MEO GIỐNG (LC1, LC2, LC3)
-- Đội Trái Tim Xanh đang quản lý và phát triển ba dòng meo giống nấm Linh Chi chính, bao gồm LC1, LC2 và LC3.
-- Giống LC1: Định danh PCR khớp Ganoderma Lucidum trên NCBI. Quả thể to tròn, đỏ sẫm, thơm nhẹ. Tích hợp mã QR kiểm chứng.
-- Giống LC2: Định danh PCR khớp Ganoderma Lingzhi trên NCBI. Tích hợp mã QR kiểm chứng.
-- Giống LC3: Kích thước to, màu nâu sẫm, vị đắng chát.
-- Cả ba loại meo giống đều phát triển tơ nấm trắng trên môi trường hạt lúa, phân biệt qua mã QR trên bịch.
-
-2. CƠ CHẤT VÀ KỸ THUẬT PCR / QR CODE
-- Cơ chất tốt nhất cho LC3 là mùn cưa cao su (hoặc mùn cưa cây không chứa tinh dầu).
-- Kỹ thuật PCR giúp xác định chính xác trình tự gen, đối chiếu ngân hàng gen NCBI, đảm bảo độ thuần chủng.
-- Mỗi bịch meo tích hợp mã QR miễn phí để người dùng truy xuất nguồn gốc và cơ sở gen.
-
-3. QUY TRÌNH TRỒNG VÀ THU HOẠCH
-- 1 bịch meo cấy được tối thiểu 40 túi phôi.
-- Chạy tơ: Bắt đầu sau 7-10 ngày, ăn kín bịch phôi sau 25-30 ngày.
-- Thu hoạch quả thể sau 65-75 ngày từ khi chạy tơ (hoặc 2.5 - 3 tháng sau khi cấy). Viền mép chuyển sang màu nâu đỏ/cánh gián, cứng cáp.
-
-4. NHẬN BIẾT MEO GIỐNG VÀ XỬ LÝ NHIỄM
-- Meo tốt: Tơ trắng đều, bám chắc, không mùi hôi/mốc lạ hay đốm xanh/đen.
-- Khi bị nhiễm (đốm mốc, mùi thối): Tiêu hủy ngay bịch nhiễm, khử trùng khu vực trồng bằng cồn/dung dịch chuyên dụng.
-
-5. BẢO QUẢN VÀ SỬ DỤNG
-- Bảo quản meo: Nơi thoáng mát, tránh ánh sáng trực tiếp và ẩm thấp.
-- Liều dùng: 3-5g nấm khô/ngày (2-3 lát mỏng) hãm trà hoặc nấu mật ong/ngâm rượu. Không dùng quá 15g/ngày.
-
-LƯU Ý ĐẶC BIỆT: Trả lời ngắn gọn (dưới 3 câu), tự nhiên, không dùng bất kỳ ký tự định dạng Markdown nào (như dấu sao *, gạch đầu dòng -, gạch dưới _) để giọng đọc AI không bị đọc nhầm ký tự đặc biệt.
-`;
-
-    // -----------------------------------------------------------------
-    // 2. LOGIC THỜI TIẾT OPENWEATHERMAP
-    // -----------------------------------------------------------------
     function fetchWeatherAndForecast(lat, lon) {
         const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=vi&appid=${WEATHER_API_KEY}`;
         const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&lang=vi&appid=${WEATHER_API_KEY}`;
 
+        // Lấy thời tiết hiện tại
         fetch(currentWeatherUrl)
             .then(res => res.json())
             .then(data => {
@@ -276,6 +233,7 @@ LƯU Ý ĐẶC BIỆT: Trả lời ngắn gọn (dưới 3 câu), tự nhiên, k
                 document.getElementById('weatherCity').innerText = "Lỗi kết nối thời tiết";
             });
 
+        // Lấy dự báo ngày mai
         fetch(forecastUrl)
             .then(res => res.json())
             .then(data => {
@@ -293,6 +251,7 @@ LƯU Ý ĐẶC BIỆT: Trả lời ngắn gọn (dưới 3 câu), tự nhiên, k
             });
     }
 
+    // Tự động định vị GPS vị trí người dùng
     function initGeolocation() {
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
@@ -300,6 +259,7 @@ LƯU Ý ĐẶC BIỆT: Trả lời ngắn gọn (dưới 3 câu), tự nhiên, k
                     fetchWeatherAndForecast(position.coords.latitude, position.coords.longitude);
                 },
                 (error) => {
+                    // Mặc định TP.HCM nếu không cấp quyền vị trí
                     document.getElementById('weatherCity').innerText = "TP. Hồ Chí Minh (Mặc định)";
                     fetchWeatherAndForecast(10.7769, 106.7009);
                 }
@@ -308,142 +268,165 @@ LƯU Ý ĐẶC BIỆT: Trả lời ngắn gọn (dưới 3 câu), tự nhiên, k
             document.getElementById('weatherCity').innerText = "Không hỗ trợ định vị";
         }
     }
+
     initGeolocation();
-
-    // -----------------------------------------------------------------
-    // 3. THUẬT TOÁN ĐỌC GIỌNG NÓI TIẾNG VIỆT TỰ NHIÊN
-    // -----------------------------------------------------------------
-    let vietnameseVoice = null;
-
-    function loadVoices() {
-        if ('speechSynthesis' in window) {
-            const voices = window.speechSynthesis.getVoices();
-            // Lọc ưu tiên giọng nói Tiếng Việt tự nhiên nhất theo hệ điều hành/trình duyệt
-            vietnameseVoice = voices.find(voice => 
-                voice.lang.includes('vi') || voice.lang.includes('vi-VN') || voice.lang.includes('vi_VN')
-            );
+    
+    // TOÀN BỘ CƠ SỞ DỮ LIỆU ÂM THANH
+    const KNOWLEDGE_BASE = [
+        {
+            keywords: ["thu hoạch", "bao lâu", "mấy ngày", "quả thể", "mấy tháng"],
+            reply: "Trong điều kiện dinh dưỡng đầy đủ và chăm sóc đúng cách thì anh/chị có thể thu hoạch quả thể sau 65 đến 75 ngày kể từ ngày giống bắt đầu chạy tơ.",
+            audio: "audio.thoi_gian_thu_hoach.mp3"
+        },
+        {
+            keywords: ["chạy tơ", "bắt đầu", "yếu tố", "mấy ngày chạy tơ", "thời điểm"],
+            reply: "Thời điểm để giống bắt đầu chạy tơ phụ thuộc vào rất nhiều yếu tố như nhiệt độ môi trường, dinh dưỡng của cơ chất, độ nén chặt của phôi. Nếu anh/chị cấy giống vào phôi có cơ chất giàu dinh dưỡng được nén chặt thì sau khoảng 7 đến 10 ngày, khi giống đã thích ứng với môi trường sẽ bắt đầu chạy tơ.",
+            audio: "audio.thoi_diem_chay_to.mp3"
+        },
+        {
+            keywords: ["cách sử dụng", " dùng thế nào", "cần dùng ra sao", "pha thế nào", "trà linh chi"],
+            reply: "Hiện tại, nấm Linh Chi đóng hộp của chúng tôi có thể dùng theo cách cắt lát pha trà. Mỗi lần dùng có thể cắt 2 đến 3 lát mỏng dài khoảng 2 đốt ngón tay và pha với một lượng nước sôi vừa phải. Mỗi ngày dùng một cốc sẽ giúp cải thiện chất lượng giấc ngủ và hỗ trợ điều hòa hoạt động tim mạch.",
+            audio: "audio.cach_su-dung.mp3",
+            image: "tralihchi.jpg"
         }
+            keywords: ["cách dùng khác", "ngoài nấu trà", "ngâm rượu", "dùng khác", " gợi ý cách dùng khác"],
+            reply: "Ngoài nấu trà, nấm Linh Chi còn có thể được dùng để ngâm với rượu. Nấm Linh Chi khi được dùng để ngâm rượu sẽ cho ra chất rượu màu nâu sẫm, có vị đắng, ngâm càng lâu rượu sẽ càng đắng. Bên cạnh đó, nấm Linh Chi còn có thể được dùng để nấu chung với mật ong uống hằng ngày hoặc sắc chung với các vị thuốc khác để tăng cường dược tính.",
+            audio: "a,
+        {udio.cach_su_dung_khac.mp3",
+            image: "cachdugkhac.jpg"
+        },
+        {
+            keywords: ["túi phôi", "bịch meo", "cấy được bao nhiêu phôi","cấy", "bao nhiêu phôi", "số lượng"],
+            reply: "Một bịch meo giống nhóm cung cấp, anh/chị có thể cấy tối thiểu khoảng 40 túi phôi.",
+            audio: "audio.san_luong_phoi.mp3"
+        },
+        {
+            keywords: ["lc3", "nguồn gốc", "ncbi", "giống nấm gì", "lấy giống ở đâu", "trưng bày", "chứng nhận"],
+            reply: "Meo giống hiện tại đội đang trưng bày là meo giống nấm LC3. Giống nấm này được chính các thành viên trong đội thực hiện kỹ thuật nhân giống và áp dụng công nghệ truy xuất nguồn gốc PCR nên người dùng hoàn toàn có thể yên tâm về tính minh bạch của nguồn gốc giống. Quả thể cho ra từ meo giống LC3 có kích thước to, màu nâu sẫm, khi dùng sẽ có vị đắng chát.Bạn có thể truy cập link này để biết thêm thông tin về giống nấm và quy trình tạo ra thành phẩm của đội https://remix-tr-l-n-m-linh-chi-ai-truy-xu-t-ngu-n-g-c-1843.ai.studio",
+            audio: "audio.nguon_goc_nam.mp3"
+        },
+        {
+            keywords: ["nhiễm tạp", "mốc", "đốm xanh", "mùi thối", "xử lý", "tiêu hủy", "dấu hiệu","mốc vàng", "xử lí nhiễm", "dấu hiệu bệnh"],
+            reply: "Để phát hiện meo giống bị nhiễm tạp, anh/chị có thể quan sát các dấu hiệu như các đốm mốc xanh, vàng, đen xuất hiện trên vùng tơ nấm trắng hoặc bám quanh cơ chất. Hoặc meo giống có mùi thối đậm đặc (thông thường meo giống sẽ có mùi mốc nhẹ đặc trưng). Cách tốt nhất để xử lý meo giống nhiễm là tiêu hủy meo giống đó và khử trùng các dụng cụ, trang thiết bị đã từng tiếp xúc để tránh lây lan.",
+            audio: "audio.meo_giong_nhiem_benh.mp3",
+            image: "mocxxah.jpg"
+        },
+        {
+            keywords: ["ăn kín", "kín bịch", "kín phôi", "mấy ngày kín","chạy tơ kín"],
+            reply: "Sau khi nấm đã bắt đầu chạy tơ thì khoảng từ 25 đến 30 ngày thì tơ nấm sẽ ăn kín bịch phôi.",
+            audio: "audio.khi_nao_to_nam_an_kin_phoi.mp3"
+        },
+        {
+            keywords: ["ăn được không", "thực phẩm", "đắng", "dai", "cứng", "chế biến", "vị","nấu ăn",  "nấu lẩu", "dùng làm thực phẩm"],
+            reply: "Khác với các loại nấm khác, nấm Linh Chi có vị đắng chát do có dược tính cao, đồng thời thịt nấm dai và cứng nên ít được sử dụng làm thực phẩm, mà thường được chế biến để làm trà, làm bột, chiết xuất.",
+            audio: "audio.linhchi_an_duoc_khong.mp3"
+        },
+        {
+            keywords: ["bảo quản", "môi trường", "bảo quản thế nào", "nhiệt độ", "ẩm", "nhiễm"],
+            reply: "Meo giống mua về cần được bảo quản trong môi trường thoáng mát, nhiệt độ vừa phải, tránh ánh sáng trực tiếp. Đặc biệt lưu ý không được để meo giống bị ướt hoặc để meo trong môi trường ẩm thấp vì sẽ tạo điều kiện thuận lợi cho các loại nấm mốc phát triển gây nhiễm tạp.",
+            audio: "audio.dieu_kien_bao_quan.mp3"
+        },
+        {
+            keywords: ["cơ chất", "mùn cưa", "trồng", "thử nghiệm", "cao su", "thay thế","trồng trên đâu"],
+            reply: "Qua quá trình trồng thử nghiệm, nhóm nhận thấy meo giống nấm LC3 hoạt động tốt trên cơ chất là mùn cưa cao su. Tuy nhiên, bạn vẫn có thể thay thế bằng mùn cưa của các loại cây thân không chứa tinh dầu để làm cơ chất cho nấm.",
+            audio: "audio.co_chat.mp3",
+            image: "caosu.jpg"
+        },
+        {
+            keywords: ["tác dụng", "công dụng", "chữa bệnh", "sức khỏe", "lợi ích", "ung thư"],
+        reply: "Các nghiên cứu đã ghi nhận, Linh Chi có tác dụng hỗ trợ tăng cường miễn dịch nhờ Polysaccharide Beta-glucan, có đặc tính chống oxy hóa, hỗ trợ giảm mệt mỏi và cải thiện chất lượng giấc ngủ. Một số nghiên cứu lâm sàng quy mô nhỏ cho thấy tiềm năng hỗ trợ ổn định đường huyết và huyết áp, hỗ trợ chức năng gan. Tuy nhiên, các tác dụng như chống ung thư hay chữa bệnh thường chỉ mới được chứng minh ở mức độ hỗ trợ trong nghiên cứu tiền lâm sàng hoặc lâm sàng nhỏ lẻ, chưa đủ bằng chứng mạnh để khẳng định là phương pháp điều trị chính thức. Nên xem Linh Chi là thực phẩm bổ trợ sức khỏe chứ không thay thế thuốc điều trị.",
+        audio: "tac_dung.mp3"
+    },
+    {
+        keywords: ["lc1", "giống lc1", "ganoderma lucidum"],
+        reply: "Giống nấm LC1 được các thành viên trong đội thực hiện nhân giống, nuôi trồng và thực hiện kỹ thuật PCR định danh và so sánh với nguồn gen trên ngân hàng gen NCBI cho ra kết quả trùng khớp với giống Ganoderma Lucidum. Chính vì vậy, người dùng hoàn toàn có thể an tâm về nguồn gốc và tính minh bạch của meo giống, quả thể cho ra từ giống này to tròn, màu đỏ sẫm có mùi thơm nhẹ. Đồng thời, trên mỗi bịch meo giống được tích hợp sẵn mã QR code, thông qua việc quét mã, người dùng hoàn toàn có thể tự kiểm chứng nguồn gốc của sản phẩm.",
+        audio: "LC1.mp3"
+    },
+    {
+        keywords: ["lc2", "giống lc2", "ganoderma lingzhi"],
+        reply: "Giống nấm LC2 được các thành viên trong đội thực hiện nhân giống, nuôi trồng và thực hiện kỹ thuật PCR định danh và so sánh với nguồn gen trên ngân hàng gen NCBI cho ra kết quả trùng khớp với giống Ganoderma Lingzhi. Chính vì vậy, người dùng hoàn toàn có thể an tâm về nguồn gốc và tính minh bạch của meo giống. Để tự kiểm chứng sản phẩm, người dùng có thể quét các mã QR được tích hợp trên bịch meo giống để biết thêm về nguồn gốc sản phẩm.",
+        audio: "LC2.mp3"
+    },
+    {
+        keywords: ["mốc xanh", "mốc đen", "hôi", "nhiễm bệnh", "xử lý mốc", "bị hỏng"],
+        reply: "Ngay khi thấy có đốm mốc xanh, mốc đen cùng mùi hôi xuất hiện là dấu hiệu cho thấy phôi nấm đã bị nhiễm, ngay lập tức cần cách ly phôi nhiễm ra khỏi khu vực trồng để tránh lây lan sang các bịch khác. Tiến hành khử trùng khu vực trồng bằng cồn hoặc dung dịch khử trùng chuyên dụng, kiểm tra tình trạng các bịch phôi lân cận để kịp thời xử lý. Đồng thời, rà soát lại điều kiện môi trường, giảm độ ẩm nếu quá cao, tăng thông thoáng. Nếu tỷ lệ nhiễm bệnh lây rộng, nên loại bỏ hoàn toàn bịch phôi hỏng và khử trùng lại toàn bộ khu vực trước khi cấy đợt mới.",
+        audio: "xu_li_nhiem.mp3"
+    },
+    {
+        keywords: ["liều dùng", "cách dùng", "uống", "bao nhiêu gram", "mấy gam"],
+        reply: "Đối với nấm Linh Chi, liều dùng phổ biến khoảng 3 đến 5g nấm khô trên ngày từ 2 đến 3 lát nấm, dùng hãm trà, sắc nước uống trong ngày, nấu cùng với mật ong, có thể chia làm 2 3 lần uống trong ngày. Không nên dùng quá 15g trên ngày vì có thể gây một số tác dụng không mong muốn như khô miệng, chóng mặt nhẹ. Hơn hết, anh chị cần lưu ý, nấm Linh Chi chỉ là thực phẩm bổ sung, không thể dùng thay thuốc chữa bệnh. Phụ nữ mang thai và cho con bú, trẻ em dưới 3 tuổi cần lưu ý khi sử dụng nấm Linh Chi.",
+        audio: "lieu_dung.mp3"
+    },
+    {
+        keywords: ["nhận biết", "meo tốt", "meo hỏng", "chọn meo"],
+        reply: "Để nhận biết meo giống tốt anh chị có thể quan sát các đặc điểm sau: Meo giống tốt thường có tơ nấm màu trắng đều, bám chắc vào cơ chất, không có mùi hôi, mùi mốc lạ hay đốm màu xanh, đen, dấu hiệu nhiễm nấm mốc. Bịch meo còn nguyên vẹn, không bị rách, không đọng nước bên trong. Nếu phát hiện tơ nấm loang lổ, có mùi hôi hoặc meo đã chuyển sang màu xanh hoặc màu vàng sẫm, khả năng cao meo đã hỏng, không nên sử dụng để cấy mà cần tiêu hủy đồng thời khử trùng các dụng cụ đã từng tiếp xúc.",
+        audio: "nhan_biet.mp3",
+        image: "meo.jpg"
+    },
+    {
+        keywords: ["bảo quản", "phơi", "sấy", "để được bao lâu"],
+        reply: "Thông thường sau khi thu hoạch cần phơi hoặc sấy khô nấm đến để tránh mốc. Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp, ánh sáng làm giảm hoạt chất và đổi màu nấm. Sau khô nếu được đựng trong túi hút chân không, hũ kín hoặc túi zip có gói hút ẩm, để nơi nhiệt độ phòng ổn định, nấm Linh Chi có thể được bảo quản trong thời gian rất dài.",
+        audio: "bao_quan.mp3"
+    },
+    {
+        keywords: ["mã qr", "quét mã", "truy xuất", "trồng thử nghiệm", "đối chiếu"],
+        reply: "Mỗi bịch meo giống đều được tích hợp một mã QR riêng. Người dùng chỉ cần sử dụng điện thoại thông minh có kết nối internet và tính năng quét mã QR hoặc camera để truy cập miễn phí thông tin về dòng meo, cơ sở gen và chứng nhận khoa học liên quan. Song song đó, đội cũng tiến hành trồng thử nghiệm meo của từng loại giống để làm kết quả đối chiếu cho người tiêu dùng, đảm bảo mỗi bịch meo mà người dùng nhận được luôn xứng đáng với số tiền và kỳ vọng bỏ ra.",
+        audio: "kiem_chung.mp3"
+    },
+    {
+        keywords: ["pcr là gì", "định danh pcr", "tại sao lại chọn PCR", "phản ứng chuỗi", "thuần chủng", "ngân hàng gene", "ncbi", "vì sao chọn kỹ thuật PCR"],
+        reply: "Định danh bằng kỹ thuật PCR (Phản ứng chuỗi Polymerase) là phương pháp sinh học phân tử dùng để nhân lên gấp hàng triệu lần một đoạn ADN mục tiêu, giúp xác định chính xác dữ liệu gen của mẫu vật. Đội chọn phương pháp này là vì nó giúp xác định chính xác trình tự gen của từng dòng nấm, đối chiếu chuẩn xác với ngân hàng gen thế giới NCBI. Điều này giúp loại bỏ nguy cơ nhầm lẫn giống, đảm bảo tính thuần chủng và minh bạch khoa học trước khi cung cấp ra thị trường.",
+        audio: "PCR.mp3"
+    },
+    {
+        keywords: ["giống nhau", "khác nhau", "hạt lúa", "tơ nấm trắng", "có gì khác nhau", "ba giống LC1,LC2,LC3 có gì khác nhau", "ba meo giống có gì khác nhau"],
+        reply: "Về cơ bản thì bề ngoài của ba loại meo giống không có gì khác nhau, cả ba loại đều cho ra tơ nấm trắng và được cấy trên môi trường hạt lúa. Chính vì cả ba giống nấm đều giống nhau nên nhóm đã tích hợp sẵn trên mỗi bịch meo một mã QR chứa tên giống và cơ sở gen của từng loại.",
+        audio: "tac_dung_QR.mp3"
+    },
+    {
+        keywords: ["đội trái tim xanh", "3 dòng meo", "quản lý", "quản lí", "lc1 lc2 lc3", "sở hữu bao nhiêu loạI meo", "có bao nhiêu loại meo", "có mấy loại meo"],
+        reply: "Đội Trái Tim Xanh đang quản lý và phát triển ba dòng meo giống nấm Linh Chi chính, bao gồm LC1, LC2 và LC3. Tất cả các giống này đều được các thành viên trong đội thực hiện nhân giống, nuôi trồng và kiểm định nguồn gốc rõ ràng, đảm bảo tính minh bạch về nguồn gốc và chất lượng sản phẩm.",
+        audio: "so_luong_giong.mp3"
+    },
+    {
+        keywords: ["thu hoạch", "khi nào thu hoạch", "dấu hiệu thu hoạch", "thời điểm thu hoạch"],
+        reply: "Tai nấm đạt độ thu hoạch khi viền mép tai nấm chuyển từ màu trắng ngà sang cùng màu với phần thân, nâu đỏ hoặc nâu cánh gián, viền trắng ở mép gần như không còn, mặt trên bóng và cứng cáp, tai nấm không còn tiếp tục xoè rộng thêm. Thời điểm thu hoạch thường vào khoảng 2,5 đến 3 tháng sau khi cấy tùy dòng giống. Nếu anh chị muốn thu hoạch bào tử có thể để lâu hơn.",
+        audio: "do_thu_hoach.mp3",
+        image: "thuhoach.jpg"
+    },
+    {
+        keywords: ["mã qr", "quét mã", "truy xuất"],
+        reply: "Mỗi bịch meo giống được tích hợp một mã QR riêng giúp bà con và người tiêu dùng tự kiểm chứng nguồn gốc, dòng meo LC1, LC2, LC3, cơ sở gen, bằng chứng khoa học. Việc quét mã hoàn toàn miễn phí, chỉ cần điện thoại có kết nối internet và ứng dụng quét QR hoặc camera điện thoại là có thể truy cập.",
+        audio: "ma_QR.mp3"
+    },
+    {
+        keywords: ["phòng bệnh", "hạn chế nhiễm", "vệ sinh"],
+        reply: "Trong quá trình trồng để hạn chế nấm nhiễm cần vệ sinh khử trùng khu vực trồng bằng cồn hoặc dung dịch vệ sinh chuyên dụng, kiểm tra phôi nấm thường xuyên để kịp thời cách ly các phôi có dấu hiệu nhiễm tránh lây lan. Trong quá trình tưới nấm, hạn chế để nước đọng ở bịch phôi cũng như giữ môi trường trồng nấm khô thoáng, tránh đọng nước.",
+        audio: "han_che_nam_nhiem.mp3"
     }
-
-    if ('speechSynthesis' in window) {
-        loadVoices();
-        window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-
-    function speakText(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel(); // Dừng câu đang đọc nếu có
-
-            // Làm sạch văn bản trước khi đọc (xóa link, biểu tượng, ký tự đặc biệt)
-            const cleanText = text
-                .replace(/https?:\/\/\S+/g, '')
-                .replace(/[*_#~`]/g, '')
-                .replace(/([.?!])\s*/g, "$1 "); // Thêm khoảng nghỉ tự nhiên sau dấu câu
-
-            const utterance = new SpeechSynthesisUtterance(cleanText);
-
-            if (vietnameseVoice) {
-                utterance.voice = vietnameseVoice;
-            }
-
-            utterance.lang = 'vi-VN';
-            utterance.rate = 0.95; // Tốc độ nói hơi chậm lại một chút để chuẩn giọng tự nhiên
-            utterance.pitch = 1.0;
+];
             
-            window.speechSynthesis.speak(utterance);
-        }
-    }
+   
+    // CÂU TRẢ LỜI MẶC ĐỊNH KHI KHÔNG CÓ DỮ LIỆU (KÈM ẢNH LOI.JPG)
+    const DEFAULT_REPLY = {
+        reply: "Xin lỗi, tôi chưa hiểu rõ ý anh/chị lắm. Anh/chị có thể cung cấp thêm thông tin về câu hỏi được không?",
+        audio: "audio.khong_hieu.mp3",
+        image: "loi.jpg"
+    };
 
-    // -----------------------------------------------------------------
-    // 4. GIAO TIẾP VỚI OPENROUTER API
-    // -----------------------------------------------------------------
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
     const micBtn = document.getElementById('micBtn');
     const sendBtn = document.getElementById('sendBtn');
 
-    let chatHistory = [
-        { role: "system", content: SYSTEM_INSTRUCTION }
-    ];
+    let currentAudio = null;
 
     sendBtn.addEventListener('click', sendMessage);
     userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
     });
 
-    function addMessage(text, sender) {
-        const msgDiv = document.createElement('div');
-        msgDiv.classList.add('message', sender);
-        msgDiv.innerText = text;
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        return msgDiv;
-    }
-
-    async function fetchAIResponse(userQuery) {
-        if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === "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") {
-            return "Bạn chưa dán OPENROUTER_API_KEY vào mã nguồn! Hãy dán API Key của bạn vào biến OPENROUTER_API_KEY trong file HTML.";
-        }
-
-        const endpoint = "https://openrouter.ai/api/v1/chat/completions";
-
-        chatHistory.push({ role: "user", content: userQuery });
-
-        const requestBody = {
-            model: "google/gemini-2.0-flash-lite-001:free", // Sử dụng mô hình miễn phí tốc độ cao của OpenRouter
-            messages: chatHistory
-        };
-
-        try {
-            const response = await fetch(endpoint, {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            const data = await response.json();
-            
-            if (data.choices && data.choices[0].message.content) {
-                const aiReply = data.choices[0].message.content;
-                chatHistory.push({ role: "assistant", content: aiReply });
-                return aiReply;
-            } else if (data.error) {
-                console.error("Lỗi OpenRouter API:", data.error);
-                return `Lỗi API: ${data.error.message || "Vui lòng kiểm tra lại Key!"}`;
-            } else {
-                return "Rất tiếc, tôi chưa thể xử lý câu hỏi này lúc này.";
-            }
-        } catch (error) {
-            console.error("Lỗi kết nối AI:", error);
-            return "Lỗi kết nối mạng hoặc không thể kết nối đến OpenRouter API.";
-        }
-    }
-
-    async function sendMessage() {
-        const text = userInput.value.trim();
-        if (!text) return;
-
-        addMessage(text, 'user');
-        userInput.value = '';
-        sendBtn.disabled = true;
-
-        const loadingMsg = addMessage("Đang suy nghĩ...", 'bot');
-
-        const aiReply = await fetchAIResponse(text);
-
-        loadingMsg.innerText = aiReply;
-        sendBtn.disabled = false;
-
-        // Phát giọng nói tiếng Việt
-        speakText(aiReply);
-    }
-
-    // -----------------------------------------------------------------
-    // 5. NHẬN DIỆN GIỌNG NÓI (VOICE-TO-TEXT)
-    // -----------------------------------------------------------------
+    // CẤU HÌNH WEB SPEECH API (NHẬN DIỆN GIỌNG NÓI)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let isRecording = false;
@@ -474,11 +457,11 @@ LƯU Ý ĐẶC BIỆT: Trả lời ngắn gọn (dưới 3 câu), tự nhiên, k
                 isRecording = false; 
                 micBtn.classList.remove('recording'); 
                 if (e.error === 'not-allowed') {
-                    alert("Chưa cấp quyền Micro! Hãy mở cài đặt trình duyệt để Cho phép (Allow) truy cập Micro.");
+                    alert("Chưa được cấp quyền Micro! Bấm vào biểu tượng Ổ khóa trên thanh địa chỉ để Cho phép (Allow) Micro.");
                 }
             };
         } catch (err) {
-            console.error("Lỗi SpeechRecognition:", err);
+            console.error("Lỗi khởi tạo SpeechRecognition:", err);
         }
     } else {
         micBtn.style.display = 'none';
@@ -486,7 +469,7 @@ LƯU Ý ĐẶC BIỆT: Trả lời ngắn gọn (dưới 3 câu), tự nhiên, k
 
     micBtn.addEventListener('click', () => {
         if (!recognition) {
-            alert("Trình duyệt không hỗ trợ nhận diện giọng nói. Hãy dùng Google Chrome hoặc Microsoft Edge!");
+            alert("Trình duyệt không hỗ trợ nhận diện giọng nói. Hãy dùng trình duyệt Google Chrome!");
             return;
         }
         if (isRecording) {
@@ -499,6 +482,78 @@ LƯU Ý ĐẶC BIỆT: Trả lời ngắn gọn (dưới 3 câu), tự nhiên, k
             }
         }
     });
+
+    // THÊM BONG BÓNG TIN NHẮN (CÓ HỖ TRỢ KÈM ẢNH)
+    function addMessage(text, sender, imageUrl = null) {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', sender);
+        
+        // Thêm đoạn chữ
+        const textNode = document.createTextNode(text);
+        msgDiv.appendChild(textNode);
+
+        // Thêm ảnh nếu có
+        if (imageUrl) {
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.classList.add('chat-reply-img');
+            img.alt = 'Thông báo lỗi';
+            msgDiv.appendChild(img);
+        }
+
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // KHẮC PHỤC LỖI VÀ TÌM DỮ LIỆU
+    function getBotData(text) {
+        const lowerText = text.toLowerCase();
+        for (const item of KNOWLEDGE_BASE) {
+            if (item.keywords.some(kw => lowerText.includes(kw))) {
+                return item;
+            }
+        }
+        return DEFAULT_REPLY;
+    }
+
+    // PHÁT FILE ÂM THANH MP3
+    function playAudioFile(audioSrc, fallbackText) {
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+        }
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+        if (audioSrc) {
+            currentAudio = new Audio(audioSrc);
+            currentAudio.play().catch(() => speakFallbackText(fallbackText));
+        } else {
+            speakFallbackText(fallbackText);
+        }
+    }
+
+    function speakFallbackText(text) {
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'vi-VN';
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        addMessage(text, 'user');
+        userInput.value = '';
+
+        setTimeout(() => {
+            const botData = getBotData(text);
+            // Truyền botData.image vào hàm addMessage
+            addMessage(botData.reply, 'bot', botData.image);
+            playAudioFile(botData.audio, botData.reply);
+        }, 300);
+    }
 </script>
 </body>
 </html>
